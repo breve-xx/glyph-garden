@@ -80,7 +80,7 @@ export default class VowelLikeAMacPreferences extends ExtensionPreferences {
             adjustment: new Gtk.Adjustment({
                 lower: 0,
                 upper: 100,
-                step_increment: 1,
+                step_increment: 10,
                 page_increment: 10,
             }),
             digits: 0,
@@ -91,6 +91,11 @@ export default class VowelLikeAMacPreferences extends ExtensionPreferences {
         });
         settings.bind('dialog-opacity', opacityScale.adjustment, 'value',
             Gio.SettingsBindFlags.DEFAULT);
+        opacityScale.adjustment.connect('value-changed', adj => {
+            const snapped = Math.round(adj.value / 10) * 10;
+            if (adj.value !== snapped)
+                adj.value = snapped;
+        });
         opacityRow.add_suffix(opacityScale);
         behaviourGroup.add(opacityRow);
 
