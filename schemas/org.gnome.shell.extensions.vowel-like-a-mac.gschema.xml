@@ -15,6 +15,18 @@
       <description>Show a notification when an accented character is copied to the clipboard</description>
     </key>
 
+    <key name="copy-to-clipboard" type="b">
+      <default>true</default>
+      <summary>Copy to clipboard</summary>
+      <description>Copy the selected accented character to the clipboard</description>
+    </key>
+
+    <key name="type-character" type="b">
+      <default>true</default>
+      <summary>Type character at caret</summary>
+      <description>Insert the selected accented character at the current caret position</description>
+    </key>
+
     <key name="accent-vowel-a" type="as">
       <default>['&lt;Super&gt;&lt;Alt&gt;a']</default>
       <summary>Accent menu for A</summary>

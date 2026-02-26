@@ -3,7 +3,8 @@
  *
  * Replicates macOS-style accented vowel input.
  * Alt+Vowel opens a centered popup of diacritical variants.
- * Select a character (click, number key, or arrow+Enter) to copy it to clipboard.
+ * Select a character (click, number key, or arrow+Enter) to copy it to clipboard
+ * and type it at the current caret position.
  */
 
 import GLib from 'gi://GLib';
@@ -64,7 +65,7 @@ class AccentPopup extends St.BoxLayout {
 
         this._hintBar = new St.Label({
             style_class: 'accent-hint-bar',
-            text: '← → to navigate · Enter to copy · Shift to toggle case · Esc to close',
+            text: '← → to navigate · Enter to copy & type · Shift to toggle case · Esc to close',
             x_align: Clutter.ActorAlign.CENTER,
         });
         this.add_child(this._hintBar);
@@ -183,11 +184,55 @@ class AccentPopup extends St.BoxLayout {
     _selectChar(index) {
         if (index < 0 || index >= this._currentChars.length) return;
         const char = this._currentChars[index];
-        const clipboard = St.Clipboard.get_default();
-        clipboard.set_text(St.ClipboardType.CLIPBOARD, char);
-        if (this._extension._settings.get_boolean('show-notification'))
-            Main.notify('Vowel Like a Mac', `"${char}" copied to clipboard`);
+        const settings = this._extension._settings;
+        const doCopy = settings.get_boolean('copy-to-clipboard');
+        const doType = settings.get_boolean('type-character');
+
+        if (doCopy) {
+            const clipboard = St.Clipboard.get_default();
+            clipboard.set_text(St.ClipboardType.CLIPBOARD, char);
+        }
+
+        if (settings.get_boolean('show-notification'))
+            Main.notify('Vowel Like a Mac', `"${char}" copied and typed`);
         this.dismiss();
+
+        if (doType) {
+            if (doCopy) {
+                // Clipboard already has the character — simulate Ctrl+V
+                GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+                    const seat = Clutter.get_default_backend().get_default_seat();
+                    const vk = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+                    const now = Clutter.get_current_event_time();
+                    vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+                    vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.PRESSED);
+                    vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.RELEASED);
+                    vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                    return GLib.SOURCE_REMOVE;
+                });
+            } else {
+                // Copy-to-clipboard is off — temporarily set clipboard, paste, then restore
+                const clipboard = St.Clipboard.get_default();
+                clipboard.get_text(St.ClipboardType.CLIPBOARD, (_cb, previous) => {
+                    clipboard.set_text(St.ClipboardType.CLIPBOARD, char);
+                    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+                        const seat = Clutter.get_default_backend().get_default_seat();
+                        const vk = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+                        const now = Clutter.get_current_event_time();
+                        vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+                        vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.PRESSED);
+                        vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.RELEASED);
+                        vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+                        // Restore previous clipboard content
+                        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+                            clipboard.set_text(St.ClipboardType.CLIPBOARD, previous || '');
+                            return GLib.SOURCE_REMOVE;
+                        });
+                        return GLib.SOURCE_REMOVE;
+                    });
+                });
+            }
+        }
     }
 
     dismiss() {

@@ -55,6 +55,22 @@ export default class VowelLikeAMacPreferences extends ExtensionPreferences {
             Gio.SettingsBindFlags.DEFAULT);
         behaviourGroup.add(notifyRow);
 
+        const copyRow = new Adw.SwitchRow({
+            title: _('Copy to clipboard'),
+            subtitle: _('Copy the selected character to the clipboard'),
+        });
+        settings.bind('copy-to-clipboard', copyRow, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        behaviourGroup.add(copyRow);
+
+        const typeRow = new Adw.SwitchRow({
+            title: _('Type character at caret'),
+            subtitle: _('Insert the selected character at the current caret position'),
+        });
+        settings.bind('type-character', typeRow, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        behaviourGroup.add(typeRow);
+
         // --- Modifier prefix group ---
         const prefixGroup = new Adw.PreferencesGroup({
             title: _('Modifier Prefix'),
