@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="vowel-like-a-mac">
+  <schema id="org.gnome.shell.extensions.vowel-like-a-mac"
+          path="/org/gnome/shell/extensions/vowel-like-a-mac/">
+
+    <key name="modifier-prefix" type="s">
+      <default>'&lt;Super&gt;&lt;Alt&gt;'</default>
+      <summary>Modifier prefix</summary>
+      <description>Modifier key combination prepended to each vowel key. Changing this updates all five vowel shortcuts at once. Examples: &lt;Super&gt;&lt;Alt&gt;, &lt;Ctrl&gt;&lt;Alt&gt;, &lt;Super&gt;&lt;Shift&gt;</description>
+    </key>
+
+    <key name="accent-vowel-a" type="as">
+      <default>['&lt;Super&gt;&lt;Alt&gt;a']</default>
+      <summary>Accent menu for A</summary>
+      <description>Keyboard shortcut to open the accent menu for the vowel A</description>
+    </key>
+
+    <key name="accent-vowel-e" type="as">
+      <default>['&lt;Super&gt;&lt;Alt&gt;e']</default>
+      <summary>Accent menu for E</summary>
+      <description>Keyboard shortcut to open the accent menu for the vowel E</description>
+    </key>
+
+    <key name="accent-vowel-i" type="as">
+      <default>['&lt;Super&gt;&lt;Alt&gt;i']</default>
+      <summary>Accent menu for I</summary>
+      <description>Keyboard shortcut to open the accent menu for the vowel I</description>
+    </key>
+
+    <key name="accent-vowel-o" type="as">
+      <default>['&lt;Super&gt;&lt;Alt&gt;o']</default>
+      <summary>Accent menu for O</summary>
+      <description>Keyboard shortcut to open the accent menu for the vowel O</description>
+    </key>
+
+    <key name="accent-vowel-u" type="as">
+      <default>['&lt;Super&gt;&lt;Alt&gt;u']</default>
+      <summary>Accent menu for U</summary>
+      <description>Keyboard shortcut to open the accent menu for the vowel U</description>
+    </key>
+
+  </schema>
+</schemalist>

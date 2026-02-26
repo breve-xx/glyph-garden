@@ -1,0 +1,61 @@
+/* Vowel Like a Mac — Popup Stylesheet */
+
+.accent-popup {
+  background-color: rgba(30, 30, 30, 0.95);
+  border-radius: 16px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.accent-popup-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.accent-popup-row {
+  spacing: 8px;
+}
+
+.accent-button {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 4px;
+  min-width: 48px;
+  min-height: 48px;
+  text-align: center;
+  transition-duration: 150ms;
+}
+
+.accent-button:hover,
+.accent-button:focus {
+  background-color: rgba(62, 132, 255, 0.8);
+}
+
+.accent-button-selected {
+  background-color: rgba(62, 132, 255, 0.9);
+  border: 2px solid rgba(100, 160, 255, 0.9);
+}
+
+.accent-button-char {
+  font-size: 28px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.accent-button-hint {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin-top: 2px;
+}
+
+.accent-hint-bar {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 10px;
+  text-align: center;
+}
