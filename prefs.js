@@ -7,6 +7,7 @@
  */
 
 import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 import Gdk from 'gi://Gdk';
 import GObject from 'gi://GObject';
@@ -39,6 +40,20 @@ export default class VowelLikeAMacPreferences extends ExtensionPreferences {
             icon_name: 'input-keyboard-symbolic',
         });
         window.add(page);
+
+        // --- Behaviour group ---
+        const behaviourGroup = new Adw.PreferencesGroup({
+            title: _('Behaviour'),
+        });
+        page.add(behaviourGroup);
+
+        const notifyRow = new Adw.SwitchRow({
+            title: _('Show notification on copy'),
+            subtitle: _('Display a notification when a character is copied to the clipboard'),
+        });
+        settings.bind('show-notification', notifyRow, 'active',
+            Gio.SettingsBindFlags.DEFAULT);
+        behaviourGroup.add(notifyRow);
 
         // --- Modifier prefix group ---
         const prefixGroup = new Adw.PreferencesGroup({

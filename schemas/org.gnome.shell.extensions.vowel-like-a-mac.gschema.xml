@@ -9,6 +9,12 @@
       <description>Modifier key combination prepended to each vowel key. Changing this updates all five vowel shortcuts at once. Examples: &lt;Super&gt;&lt;Alt&gt;, &lt;Ctrl&gt;&lt;Alt&gt;, &lt;Super&gt;&lt;Shift&gt;</description>
     </key>
 
+    <key name="show-notification" type="b">
+      <default>true</default>
+      <summary>Show notification on copy</summary>
+      <description>Show a notification when an accented character is copied to the clipboard</description>
+    </key>
+
     <key name="accent-vowel-a" type="as">
       <default>['&lt;Super&gt;&lt;Alt&gt;a']</default>
       <summary>Accent menu for A</summary>

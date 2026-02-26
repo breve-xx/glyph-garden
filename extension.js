@@ -46,6 +46,8 @@ class AccentPopup extends St.BoxLayout {
         this._selectedIndex = 0;
         this._buttons = [];
         this._currentChars = [];
+        this._baseVowel = '';
+        this._isUppercase = false;
 
         this._title = new St.Label({
             style_class: 'accent-popup-title',
@@ -62,7 +64,7 @@ class AccentPopup extends St.BoxLayout {
 
         this._hintBar = new St.Label({
             style_class: 'accent-hint-bar',
-            text: '← → to navigate · Enter to copy · Esc to close',
+            text: '← → to navigate · Enter to copy · Shift to toggle case · Esc to close',
             x_align: Clutter.ActorAlign.CENTER,
         });
         this.add_child(this._hintBar);
@@ -74,6 +76,8 @@ class AccentPopup extends St.BoxLayout {
         const chars = ALL_ACCENTS[vowel];
         if (!chars) return;
 
+        this._baseVowel = vowel.toLowerCase();
+        this._isUppercase = vowel !== vowel.toLowerCase();
         this._currentChars = chars;
         this._selectedIndex = 0;
         this._title.set_text(`Accents for "${vowel}"`);
@@ -159,12 +163,30 @@ class AccentPopup extends St.BoxLayout {
         });
     }
 
+    _toggleCase() {
+        const newVowel = this._isUppercase
+            ? this._baseVowel
+            : this._baseVowel.toUpperCase();
+        const newChars = ALL_ACCENTS[newVowel];
+        if (!newChars) return;
+
+        this._isUppercase = !this._isUppercase;
+        this._currentChars = newChars;
+        this._title.set_text(`Accents for "${newVowel}"`);
+
+        this._buttons.forEach((btn, i) => {
+            const charLabel = btn.get_child_at_index(0);
+            charLabel.set_text(newChars[i]);
+        });
+    }
+
     _selectChar(index) {
         if (index < 0 || index >= this._currentChars.length) return;
         const char = this._currentChars[index];
         const clipboard = St.Clipboard.get_default();
         clipboard.set_text(St.ClipboardType.CLIPBOARD, char);
-        Main.notify('Vowel Like a Mac', `"${char}" copied to clipboard`);
+        if (this._extension._settings.get_boolean('show-notification'))
+            Main.notify('Vowel Like a Mac', `"${char}" copied to clipboard`);
         this.dismiss();
     }
 
@@ -172,11 +194,19 @@ class AccentPopup extends St.BoxLayout {
         this._currentChars = [];
         this._buttons = [];
         this._selectedIndex = 0;
+        this._baseVowel = '';
+        this._isUppercase = false;
         this.hide();
     }
 
     vfunc_key_press_event(event) {
         const symbol = event.get_key_symbol();
+
+        // Shift → toggle case
+        if (symbol === Clutter.KEY_Shift_L || symbol === Clutter.KEY_Shift_R) {
+            this._toggleCase();
+            return Clutter.EVENT_STOP;
+        }
 
         // Escape → dismiss
         if (symbol === Clutter.KEY_Escape) {
