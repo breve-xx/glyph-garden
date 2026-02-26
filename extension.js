@@ -125,6 +125,9 @@ class AccentPopup extends St.BoxLayout {
             this._row.add_child(btn);
         });
 
+        const opacityPct = this._extension._settings.get_int('dialog-opacity');
+        this.opacity = Math.round(opacityPct * 255 / 100);
+
         this._updateSelection();
         this._positionCenter();
         this.show();

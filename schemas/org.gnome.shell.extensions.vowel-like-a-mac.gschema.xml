@@ -16,7 +16,7 @@
     </key>
 
     <key name="copy-to-clipboard" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Copy to clipboard</summary>
       <description>Copy the selected accented character to the clipboard</description>
     </key>
@@ -25,6 +25,13 @@
       <default>true</default>
       <summary>Type character at caret</summary>
       <description>Insert the selected accented character at the current caret position</description>
+    </key>
+
+    <key name="dialog-opacity" type="i">
+      <default>100</default>
+      <summary>Dialog opacity</summary>
+      <description>Opacity of the accent popup dialog (0–100%)</description>
+      <range min="0" max="100"/>
     </key>
 
     <key name="accent-vowel-a" type="as">

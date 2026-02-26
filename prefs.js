@@ -71,6 +71,29 @@ export default class VowelLikeAMacPreferences extends ExtensionPreferences {
             Gio.SettingsBindFlags.DEFAULT);
         behaviourGroup.add(typeRow);
 
+        const opacityRow = new Adw.ActionRow({
+            title: _('Dialog opacity'),
+            subtitle: _('Adjust the opacity of the accent popup (0–100%)'),
+        });
+        const opacityScale = new Gtk.Scale({
+            orientation: Gtk.Orientation.HORIZONTAL,
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 100,
+                step_increment: 1,
+                page_increment: 10,
+            }),
+            digits: 0,
+            draw_value: true,
+            value_pos: Gtk.PositionType.RIGHT,
+            hexpand: true,
+            valign: Gtk.Align.CENTER,
+        });
+        settings.bind('dialog-opacity', opacityScale.adjustment, 'value',
+            Gio.SettingsBindFlags.DEFAULT);
+        opacityRow.add_suffix(opacityScale);
+        behaviourGroup.add(opacityRow);
+
         // --- Modifier prefix group ---
         const prefixGroup = new Adw.PreferencesGroup({
             title: _('Modifier Prefix'),
