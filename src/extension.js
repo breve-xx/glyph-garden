@@ -1,5 +1,5 @@
 /**
- * Vowel Like a Mac — GNOME 49 Shell Extension
+ * Glyph Garden — GNOME 49 Shell Extension
  *
  * Replicates macOS-style accented vowel input.
  * Alt+Vowel opens a centered popup of diacritical variants.
@@ -197,7 +197,7 @@ class AccentPopup extends St.BoxLayout {
         }
 
         if (settings.get_boolean('show-notification'))
-            Main.notify('Vowel Like a Mac', `"${char}" copied and typed`);
+            Main.notify('Glyph Garden', `"${char}" copied and typed`);
         this.dismiss();
 
         if (doType) {

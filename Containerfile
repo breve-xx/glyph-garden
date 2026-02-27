@@ -1,4 +1,4 @@
-# Containerfile for testing Vowel Like a Mac GNOME extension
+# Containerfile for testing Glyph Garden GNOME extension
 #
 # This sets up a Fedora 42 environment with GNOME 49 libraries
 # for building, validating, and testing the extension.

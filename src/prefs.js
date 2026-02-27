@@ -1,5 +1,5 @@
 /**
- * Vowel Like a Mac — Preferences
+ * Glyph Garden — Preferences
  *
  * Settings UI for configuring keyboard shortcuts.
  * Includes a modifier prefix selector that updates all five vowel

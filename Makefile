@@ -1,8 +1,8 @@
-UUID = vowel-like-a-mac@breve-xx.github.io
+UUID = glyph-garden@breve-xx.github.io
 EXTENSION_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 SRC_DIR = src
 SCHEMA_DIR = $(SRC_DIR)/schemas
-SCHEMA_FILE = $(SCHEMA_DIR)/org.gnome.shell.extensions.vowel-like-a-mac.gschema.xml
+SCHEMA_FILE = $(SCHEMA_DIR)/org.gnome.shell.extensions.glyph-garden.gschema.xml
 DIST_FILES = $(SRC_DIR)/metadata.json $(SRC_DIR)/extension.js $(SRC_DIR)/prefs.js $(SRC_DIR)/stylesheet.css $(SRC_DIR)/schemas/
 
 .PHONY: all build install uninstall package clean lint

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist gettext-domain="vowel-like-a-mac">
-  <schema id="org.gnome.shell.extensions.vowel-like-a-mac"
-          path="/org/gnome/shell/extensions/vowel-like-a-mac/">
+<schemalist gettext-domain="glyph-garden">
+  <schema id="org.gnome.shell.extensions.glyph-garden"
+          path="/org/gnome/shell/extensions/glyph-garden/">
 
     <key name="modifier-prefix" type="s">
       <default>'&lt;Super&gt;&lt;Alt&gt;'</default>

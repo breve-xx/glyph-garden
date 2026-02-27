@@ -1,4 +1,4 @@
-# Vowel Like a Mac
+# Glyph Garden
 
 A GNOME 49 Shell extension that replicates macOS-style accented vowel input.
 Press **Super+Alt+Vowel** to open a centered popup of diacritical variants, then
@@ -38,7 +38,7 @@ changed to any modifier combination in the preferences.
 ## Project Structure
 
 ```
-vowel-like-a-mac/
+glyph-garden/
 ├── src/
 │   ├── metadata.json      # Extension manifest (UUID, GNOME version)
 │   ├── extension.js       # Main logic: popup, keybindings, clipboard
@@ -60,17 +60,17 @@ vowel-like-a-mac/
 make install
 
 # Log out and back in (required on Wayland), then enable:
-gnome-extensions enable vowel-like-a-mac@breve-xx.github.io
+gnome-extensions enable glyph-garden@breve-xx.github.io
 ```
 
 ### Create a Distributable Package
 
 ```bash
 make package
-# Creates dist/vowel-like-a-mac@breve-xx.github.io.zip
+# Creates dist/glyph-garden@breve-xx.github.io.zip
 
 # Install the package on any GNOME 49 machine:
-gnome-extensions install vowel-like-a-mac@breve-xx.github.io.zip
+gnome-extensions install glyph-garden@breve-xx.github.io.zip
 ```
 
 ## macOS → Linux Development Workflow
@@ -107,11 +107,11 @@ Best for: End-to-end testing with a real GNOME desktop.
 #    sudo apt install ubuntu-desktop                    # Ubuntu
 
 # 2. Copy the extension to the VM
-scp -r . user@vm-ip:~/vowel-like-a-mac/
+scp -r . user@vm-ip:~/glyph-garden/
 
 # 3. SSH in and install
 ssh user@vm-ip
-cd ~/vowel-like-a-mac
+cd ~/glyph-garden
 make install
 
 # 4. For GUI access, use VNC or remote desktop:
@@ -120,7 +120,7 @@ make install
 #    Then connect from macOS with any VNC client
 
 # 5. Enable the extension
-gnome-extensions enable vowel-like-a-mac@breve-xx.github.io
+gnome-extensions enable glyph-garden@breve-xx.github.io
 ```
 
 ### Option 3: GNOME OS / Fedora in a VM (Local)
@@ -146,10 +146,10 @@ make clean && make install
 journalctl -f -o cat /usr/bin/gnome-shell
 
 # Check extension status:
-gnome-extensions info vowel-like-a-mac@breve-xx.github.io
+gnome-extensions info glyph-garden@breve-xx.github.io
 
 # Disable the extension:
-gnome-extensions disable vowel-like-a-mac@breve-xx.github.io
+gnome-extensions disable glyph-garden@breve-xx.github.io
 ```
 
 ## Configuring Shortcuts
@@ -157,7 +157,7 @@ gnome-extensions disable vowel-like-a-mac@breve-xx.github.io
 Open GNOME Extensions preferences:
 
 ```bash
-gnome-extensions prefs vowel-like-a-mac@breve-xx.github.io
+gnome-extensions prefs glyph-garden@breve-xx.github.io
 ```
 
 ### Modifier Prefix (Recommended)
@@ -183,13 +183,13 @@ custom shortcut and a **Reset** button to restore the default.
 
 ```bash
 # Change the modifier prefix:
-dconf write /org/gnome/shell/extensions/vowel-like-a-mac/modifier-prefix "'<Ctrl><Alt>'"
+dconf write /org/gnome/shell/extensions/glyph-garden/modifier-prefix "'<Ctrl><Alt>'"
 
 # View current shortcut for vowel A:
-dconf read /org/gnome/shell/extensions/vowel-like-a-mac/accent-vowel-a
+dconf read /org/gnome/shell/extensions/glyph-garden/accent-vowel-a
 
 # Change shortcut for vowel A to Ctrl+Alt+A:
-dconf write /org/gnome/shell/extensions/vowel-like-a-mac/accent-vowel-a "['<Ctrl><Alt>a']"
+dconf write /org/gnome/shell/extensions/glyph-garden/accent-vowel-a "['<Ctrl><Alt>a']"
 ```
 
 ## Troubleshooting
@@ -200,10 +200,10 @@ dconf write /org/gnome/shell/extensions/vowel-like-a-mac/accent-vowel-a "['<Ctrl
 
 **Shortcuts don't work:**
 - Another extension or system shortcut may conflict — change the modifier prefix in preferences
-- Check: `gnome-extensions prefs vowel-like-a-mac@breve-xx.github.io`
+- Check: `gnome-extensions prefs glyph-garden@breve-xx.github.io`
 
 **Popup doesn't show:**
-- Ensure the extension is enabled: `gnome-extensions info vowel-like-a-mac@breve-xx.github.io`
+- Ensure the extension is enabled: `gnome-extensions info glyph-garden@breve-xx.github.io`
 - Look for errors in shell logs
 
 ## License
