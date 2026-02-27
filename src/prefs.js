@@ -31,7 +31,7 @@ const MODIFIER_PRESETS = [
     {label: 'Super+Ctrl',         value: '<Super><Ctrl>'},
 ];
 
-export default class VowelLikeAMacPreferences extends ExtensionPreferences {
+export default class GlyphGardenPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
 

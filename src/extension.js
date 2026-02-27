@@ -305,7 +305,7 @@ class AccentPopup extends St.BoxLayout {
     }
 });
 
-export default class VowelLikeAMac extends Extension {
+export default class GlyphGarden extends Extension {
     enable() {
         this._settings = this.getSettings();
         this._popup = new AccentPopup(this);

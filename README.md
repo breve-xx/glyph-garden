@@ -84,16 +84,16 @@ Best for: Compiling schemas, running lint checks, packaging.
 
 ```bash
 # Build the container image
-docker build -t vowel-mac-dev -f Containerfile .
+docker build -t glyph-garden-dev -f Containerfile .
 
 # Run lint checks
-docker run --rm vowel-mac-dev
+docker run --rm glyph-garden-dev
 
 # Compile schemas & package
-docker run --rm -v $(pwd)/dist:/extension/dist vowel-mac-dev make package
+docker run --rm -v $(pwd)/dist:/extension/dist glyph-garden-dev make package
 
 # Interactive shell for debugging
-docker run --rm -it vowel-mac-dev bash
+docker run --rm -it glyph-garden-dev bash
 ```
 
 ### Option 2: Remote Linux VM (Full GUI Testing)
@@ -196,7 +196,7 @@ dconf write /org/gnome/shell/extensions/glyph-garden/accent-vowel-a "['<Ctrl><Al
 
 **Extension doesn't appear after install:**
 - On Wayland, you must log out and back in after installing
-- Check: `gnome-extensions list | grep vowel`
+- Check: `gnome-extensions list | grep glyph-garden`
 
 **Shortcuts don't work:**
 - Another extension or system shortcut may conflict — change the modifier prefix in preferences

@@ -4,11 +4,11 @@
 # for building, validating, and testing the extension.
 #
 # Usage from macOS:
-#   docker build -t vowel-mac-dev -f Containerfile .
-#   docker run -it vowel-mac-dev
+#   docker build -t glyph-garden-dev -f Containerfile .
+#   docker run -it glyph-garden-dev
 #
 # For GUI testing with a virtual display:
-#   docker run -it -e DISPLAY=:99 vowel-mac-dev bash -c "Xvfb :99 &>/dev/null & sleep 1 && make lint && make build"
+#   docker run -it -e DISPLAY=:99 glyph-garden-dev bash -c "Xvfb :99 &>/dev/null & sleep 1 && make lint && make build"
 
 FROM fedora:42
 
