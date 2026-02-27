@@ -39,12 +39,13 @@ changed to any modifier combination in the preferences.
 
 ```
 vowel-like-a-mac/
-├── metadata.json          # Extension manifest (UUID, GNOME version)
-├── extension.js           # Main logic: popup, keybindings, clipboard
-├── prefs.js               # Preferences UI for shortcut configuration
-├── stylesheet.css         # Popup styling
-├── schemas/
-│   └── ...gschema.xml     # GSettings schema for keybindings
+├── src/
+│   ├── metadata.json      # Extension manifest (UUID, GNOME version)
+│   ├── extension.js       # Main logic: popup, keybindings, clipboard
+│   ├── prefs.js           # Preferences UI for shortcut configuration
+│   ├── stylesheet.css     # Popup styling
+│   └── schemas/
+│       └── ...gschema.xml # GSettings schema for keybindings
 ├── Makefile               # Build, install, package targets
 ├── Containerfile          # Docker/Podman container for testing from macOS
 └── README.md

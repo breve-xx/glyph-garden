@@ -29,8 +29,8 @@ RUN dnf install -y \
 WORKDIR /extension
 
 # Copy extension source
-COPY metadata.json extension.js prefs.js stylesheet.css Makefile ./
-COPY schemas/ ./schemas/
+COPY Makefile ./
+COPY src/ ./src/
 
 # Compile schemas and validate
 RUN make build
