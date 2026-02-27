@@ -1,10 +1,10 @@
 {
   "name": "Vowel Like a Mac",
   "description": "macOS-style accented vowel input via keyboard shortcuts. Press Alt+Vowel to see a popup of diacritical variants, then select one to copy it to your clipboard.",
-  "uuid": "vowel-like-a-mac@gnome-extensions",
+  "uuid": "vowel-like-a-mac@breve-xx.github.io",
   "shell-version": ["49"],
   "settings-schema": "org.gnome.shell.extensions.vowel-like-a-mac",
-  "url": "https://github.com/example/vowel-like-a-mac",
+  "url": "https://github.com/breve-xx/vowel-like-a-mac",
   "version": 1,
   "gettext-domain": "vowel-like-a-mac"
 }

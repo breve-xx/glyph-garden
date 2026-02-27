@@ -60,17 +60,17 @@ vowel-like-a-mac/
 make install
 
 # Log out and back in (required on Wayland), then enable:
-gnome-extensions enable vowel-like-a-mac@gnome-extensions
+gnome-extensions enable vowel-like-a-mac@breve-xx.github.io
 ```
 
 ### Create a Distributable Package
 
 ```bash
 make package
-# Creates dist/vowel-like-a-mac@gnome-extensions.zip
+# Creates dist/vowel-like-a-mac@breve-xx.github.io.zip
 
 # Install the package on any GNOME 49 machine:
-gnome-extensions install vowel-like-a-mac@gnome-extensions.zip
+gnome-extensions install vowel-like-a-mac@breve-xx.github.io.zip
 ```
 
 ## macOS → Linux Development Workflow
@@ -120,7 +120,7 @@ make install
 #    Then connect from macOS with any VNC client
 
 # 5. Enable the extension
-gnome-extensions enable vowel-like-a-mac@gnome-extensions
+gnome-extensions enable vowel-like-a-mac@breve-xx.github.io
 ```
 
 ### Option 3: GNOME OS / Fedora in a VM (Local)
@@ -146,10 +146,10 @@ make clean && make install
 journalctl -f -o cat /usr/bin/gnome-shell
 
 # Check extension status:
-gnome-extensions info vowel-like-a-mac@gnome-extensions
+gnome-extensions info vowel-like-a-mac@breve-xx.github.io
 
 # Disable the extension:
-gnome-extensions disable vowel-like-a-mac@gnome-extensions
+gnome-extensions disable vowel-like-a-mac@breve-xx.github.io
 ```
 
 ## Configuring Shortcuts
@@ -157,7 +157,7 @@ gnome-extensions disable vowel-like-a-mac@gnome-extensions
 Open GNOME Extensions preferences:
 
 ```bash
-gnome-extensions prefs vowel-like-a-mac@gnome-extensions
+gnome-extensions prefs vowel-like-a-mac@breve-xx.github.io
 ```
 
 ### Modifier Prefix (Recommended)
@@ -200,10 +200,10 @@ dconf write /org/gnome/shell/extensions/vowel-like-a-mac/accent-vowel-a "['<Ctrl
 
 **Shortcuts don't work:**
 - Another extension or system shortcut may conflict — change the modifier prefix in preferences
-- Check: `gnome-extensions prefs vowel-like-a-mac@gnome-extensions`
+- Check: `gnome-extensions prefs vowel-like-a-mac@breve-xx.github.io`
 
 **Popup doesn't show:**
-- Ensure the extension is enabled: `gnome-extensions info vowel-like-a-mac@gnome-extensions`
+- Ensure the extension is enabled: `gnome-extensions info vowel-like-a-mac@breve-xx.github.io`
 - Look for errors in shell logs
 
 ## License

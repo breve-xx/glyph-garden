@@ -1,4 +1,4 @@
-UUID = vowel-like-a-mac@gnome-extensions
+UUID = vowel-like-a-mac@breve-xx.github.io
 EXTENSION_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 SRC_DIR = src
 SCHEMA_DIR = $(SRC_DIR)/schemas
