@@ -31,6 +31,7 @@ WORKDIR /extension
 # Copy extension source
 COPY Makefile ./
 COPY src/ ./src/
+COPY tests/ ./tests/
 
 # Compile schemas and validate
 RUN make build

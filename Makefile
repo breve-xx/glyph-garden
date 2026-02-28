@@ -5,7 +5,7 @@ SCHEMA_DIR = $(SRC_DIR)/schemas
 SCHEMA_FILE = $(SCHEMA_DIR)/org.gnome.shell.extensions.glyph-garden.gschema.xml
 DIST_FILES = $(SRC_DIR)/metadata.json $(SRC_DIR)/extension.js $(SRC_DIR)/prefs.js $(SRC_DIR)/stylesheet.css $(SRC_DIR)/schemas/
 
-.PHONY: all build install uninstall package clean lint
+.PHONY: all build install uninstall package clean lint test
 
 all: build
 
@@ -43,3 +43,6 @@ lint:
 	@python3 -c "import json; json.load(open('$(SRC_DIR)/metadata.json')); print('  metadata.json: OK')" 2>/dev/null || echo "  metadata.json: INVALID"
 	@echo "Validating schema XML..."
 	@xmllint --noout $(SCHEMA_FILE) 2>/dev/null && echo "  schema: OK" || echo "  schema: VALIDATION FAILED (xmllint not found or invalid)"
+
+test: build
+	gjs -m tests/run-all.js

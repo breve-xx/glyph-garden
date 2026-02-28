@@ -46,8 +46,15 @@ glyph-garden/
 │   ├── stylesheet.css     # Popup styling
 │   └── schemas/
 │       └── ...gschema.xml # GSettings schema for keybindings
-├── Makefile               # Build, install, package targets
+├── tests/                 # Test suite (see TESTING.md)
+│   ├── run-all.js         # Entry point
+│   ├── runner.js          # Test framework
+│   ├── mocks.js           # Mock GNOME Shell APIs
+│   ├── fixtures.js        # Test data
+│   └── *.test.js          # Test files
+├── Makefile               # Build, install, package, test targets
 ├── Containerfile          # Docker/Podman container for testing from macOS
+├── TESTING.md             # Test suite documentation
 └── README.md
 ```
 
@@ -191,6 +198,24 @@ dconf read /org/gnome/shell/extensions/glyph-garden/accent-vowel-a
 # Change shortcut for vowel A to Ctrl+Alt+A:
 dconf write /org/gnome/shell/extensions/glyph-garden/accent-vowel-a "['<Ctrl><Alt>a']"
 ```
+
+## Testing
+
+The project includes a comprehensive test suite covering accent maps,
+navigation, selection, case toggling, key events, extension lifecycle,
+preferences, schema validation, and edge cases.
+
+```bash
+# Run tests (requires GJS — use the container on macOS)
+make test
+
+# Via Docker/Podman
+docker build -t glyph-garden-dev -f Containerfile .
+docker run --rm glyph-garden-dev make test
+```
+
+See [TESTING.md](TESTING.md) for full documentation on the test architecture,
+writing new tests, and CI integration.
 
 ## Troubleshooting
 
