@@ -41,7 +41,8 @@ changed to any modifier combination in the preferences.
 glyph-garden/
 ├── src/
 │   ├── metadata.json      # Extension manifest (UUID, GNOME version)
-│   ├── extension.js       # Main logic: popup, keybindings, clipboard
+│   ├── core.js            # Pure business logic (accent data, key dispatch)
+│   ├── extension.js       # Main UI: popup, keybindings, clipboard
 │   ├── prefs.js           # Preferences UI for shortcut configuration
 │   ├── stylesheet.css     # Popup styling
 │   └── schemas/
@@ -49,9 +50,9 @@ glyph-garden/
 ├── tests/                 # Test suite (see TESTING.md)
 │   ├── run-all.js         # Entry point
 │   ├── runner.js          # Test framework
-│   ├── mocks.js           # Mock GNOME Shell APIs
-│   ├── fixtures.js        # Test data
-│   └── *.test.js          # Test files
+│   ├── mocks.js           # MockExtension + GdkKeys (minimal)
+│   ├── fixtures.js        # Re-exports from src/core.js + test constants
+│   └── *.test.js          # Test files (import real core.js code)
 ├── Makefile               # Build, install, package, test targets
 ├── Containerfile          # Docker/Podman container for testing from macOS
 ├── TESTING.md             # Test suite documentation

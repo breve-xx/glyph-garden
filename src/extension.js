@@ -17,20 +17,15 @@ import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const ACCENT_MAP = {
-    a: ['à', 'á', 'â', 'ã', 'ä', 'å', 'ā', 'ă', 'ą'],
-    e: ['è', 'é', 'ê', 'ë', 'ē', 'ė', 'ę', 'ě'],
-    i: ['ì', 'í', 'î', 'ï', 'ī', 'į', 'ĩ'],
-    o: ['ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ō', 'ő'],
-    u: ['ù', 'ú', 'û', 'ü', 'ū', 'ů', 'ű', 'ų'],
-};
-
-const UPPERCASE_MAP = {};
-for (const [vowel, accents] of Object.entries(ACCENT_MAP)) {
-    UPPERCASE_MAP[vowel.toUpperCase()] = accents.map(c => c.toUpperCase());
-}
-
-const ALL_ACCENTS = {...ACCENT_MAP, ...UPPERCASE_MAP};
+import {
+    ACCENT_MAP,
+    ALL_ACCENTS,
+    resolveKeyAction,
+    toggleCase,
+    lookupVowel,
+    isValidSelection,
+    buildActionLabel,
+} from './core.js';
 
 function simulatePaste() {
     const seat = Clutter.get_default_backend().get_default_seat();
@@ -100,16 +95,16 @@ class AccentPopup extends St.BoxLayout {
     }
 
     showForVowel(vowel) {
-        const chars = ALL_ACCENTS[vowel];
-        if (!chars) {
+        const lookup = lookupVowel(vowel);
+        if (!lookup) {
             return;
         }
 
         this._clearTimeouts();
 
-        this._baseVowel = vowel.toLowerCase();
-        this._isUppercase = vowel !== vowel.toLowerCase();
-        this._currentChars = chars;
+        this._baseVowel = lookup.baseVowel;
+        this._isUppercase = lookup.isUppercase;
+        this._currentChars = lookup.chars;
         this._selectedIndex = 0;
         this._title.set_text(`Accents for "${vowel}"`);
 
@@ -201,26 +196,23 @@ class AccentPopup extends St.BoxLayout {
     }
 
     _toggleCase() {
-        const newVowel = this._isUppercase
-            ? this._baseVowel
-            : this._baseVowel.toUpperCase();
-        const newChars = ALL_ACCENTS[newVowel];
-        if (!newChars) {
+        const result = toggleCase(this._baseVowel, this._isUppercase);
+        if (!result) {
             return;
         }
 
-        this._isUppercase = !this._isUppercase;
-        this._currentChars = newChars;
-        this._title.set_text(`Accents for "${newVowel}"`);
+        this._isUppercase = result.isUppercase;
+        this._currentChars = result.chars;
+        this._title.set_text(`Accents for "${result.vowel}"`);
 
         this._buttons.forEach((btn, i) => {
             const charLabel = btn.get_child_at_index(0);
-            charLabel.set_text(newChars[i]);
+            charLabel.set_text(result.chars[i]);
         });
     }
 
     _selectChar(index) {
-        if (index < 0 || index >= this._currentChars.length) {
+        if (!isValidSelection(index, this._currentChars)) {
             return;
         }
 
@@ -233,14 +225,7 @@ class AccentPopup extends St.BoxLayout {
         }
 
         if (this._settings.get_boolean('show-notification')) {
-            const parts = [];
-            if (doCopy) {
-                parts.push('copied');
-            }
-            if (doType) {
-                parts.push('typed');
-            }
-            const action = parts.join(' and ') || 'selected';
+            const action = buildActionLabel(doCopy, doType);
             Main.notify('Glyph Garden', `"${char}" ${action}`);
         }
 
@@ -287,71 +272,37 @@ class AccentPopup extends St.BoxLayout {
 
     vfunc_key_press_event(event) {
         const symbol = event.get_key_symbol();
+        const action = resolveKeyAction(symbol, {
+            selectedIndex: this._selectedIndex,
+            currentChars: this._currentChars,
+            baseVowel: this._baseVowel,
+            isUppercase: this._isUppercase,
+        });
 
-        switch (symbol) {
-            case Clutter.KEY_Shift_L:
-            case Clutter.KEY_Shift_R: {
+        switch (action.type) {
+            case 'toggle_case': {
                 this._toggleCase();
-                return Clutter.EVENT_STOP;
+                break;
             }
-
-            case Clutter.KEY_Escape: {
+            case 'dismiss': {
                 this.dismiss();
-                return Clutter.EVENT_STOP;
+                break;
             }
-
-            case Clutter.KEY_Left:
-            case Clutter.KEY_h: {
-                this._selectedIndex = Math.max(0, this._selectedIndex - 1);
+            case 'navigate': {
+                this._selectedIndex = action.index;
                 this._updateSelection();
-                return Clutter.EVENT_STOP;
+                break;
             }
-
-            case Clutter.KEY_Right:
-            case Clutter.KEY_l: {
-                this._selectedIndex = Math.min(this._currentChars.length - 1, this._selectedIndex + 1);
-                this._updateSelection();
-                return Clutter.EVENT_STOP;
+            case 'select': {
+                this._selectChar(action.charIndex);
+                break;
             }
-
-            case Clutter.KEY_Home: {
-                this._selectedIndex = 0;
-                this._updateSelection();
-                return Clutter.EVENT_STOP;
-            }
-
-            case Clutter.KEY_End: {
-                this._selectedIndex = this._currentChars.length - 1;
-                this._updateSelection();
-                return Clutter.EVENT_STOP;
-            }
-
-            case Clutter.KEY_Return:
-            case Clutter.KEY_KP_Enter: {
-                this._selectChar(this._selectedIndex);
-                return Clutter.EVENT_STOP;
-            }
-
-            case Clutter.KEY_1:
-            case Clutter.KEY_2:
-            case Clutter.KEY_3:
-            case Clutter.KEY_4:
-            case Clutter.KEY_5:
-            case Clutter.KEY_6:
-            case Clutter.KEY_7:
-            case Clutter.KEY_8:
-            case Clutter.KEY_9: {
-                const num = symbol - Clutter.KEY_1;
-                if (num < this._currentChars.length) {
-                    this._selectChar(num);
-                }
-                return Clutter.EVENT_STOP;
-            }
-
             default: {
-                return Clutter.EVENT_STOP;
+                break;
             }
         }
+
+        return Clutter.EVENT_STOP;
     }
 });
 

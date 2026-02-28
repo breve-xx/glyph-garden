@@ -208,6 +208,13 @@ export function expect(actual) {
                     throw new Error('Expected not null');
                 }
             },
+            toEqual(expected) {
+                const a = JSON.stringify(actual);
+                const b = JSON.stringify(expected);
+                if (a === b) {
+                    throw new Error(`Expected values not to be equal: ${a}`);
+                }
+            },
             toBeUndefined() {
                 if (actual === undefined) {
                     throw new Error('Expected not undefined');

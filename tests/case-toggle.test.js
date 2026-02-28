@@ -1,114 +1,96 @@
 /**
- * Tests for case toggling logic.
+ * Tests for case toggling logic — using real toggleCase from core.js.
  */
 import {describe, it, expect} from './runner.js';
-import {ClutterKeys, MockPopup} from './mocks.js';
-import {ACCENT_MAP, UPPERCASE_MAP} from './fixtures.js';
-
-const CK = ClutterKeys;
-
-function makePopup(vowel) {
-    const popup = new MockPopup(ACCENT_MAP, UPPERCASE_MAP);
-    popup.showForVowel(vowel);
-    return popup;
-}
+import {ACCENT_MAP, UPPERCASE_MAP, toggleCase, lookupVowel, KeySyms, resolveKeyAction} from './fixtures.js';
 
 describe('Case Toggle — Basic', () => {
     it('starts lowercase when opened with lowercase vowel', () => {
-        const popup = makePopup('a');
-        expect(popup._isUppercase).toBe(false);
+        const lookup = lookupVowel('a');
+        expect(lookup.isUppercase).toBe(false);
     });
 
     it('starts uppercase when opened with uppercase vowel', () => {
-        const popup = makePopup('A');
-        expect(popup._isUppercase).toBe(true);
+        const lookup = lookupVowel('A');
+        expect(lookup.isUppercase).toBe(true);
     });
 
-    it('Shift_L toggles from lowercase to uppercase', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        expect(popup._isUppercase).toBe(true);
+    it('toggleCase flips from lowercase to uppercase', () => {
+        const result = toggleCase('a', false);
+        expect(result.isUppercase).toBe(true);
+        expect(result.vowel).toBe('A');
     });
 
-    it('Shift_R toggles from lowercase to uppercase', () => {
-        const popup = makePopup('e');
-        popup.handleKeyPress(CK.KEY_Shift_R);
-        expect(popup._isUppercase).toBe(true);
+    it('toggleCase flips from uppercase to lowercase', () => {
+        const result = toggleCase('a', true);
+        expect(result.isUppercase).toBe(false);
+        expect(result.vowel).toBe('a');
     });
 
-    it('double Shift toggles back to lowercase', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        expect(popup._isUppercase).toBe(false);
+    it('double toggle returns to original case', () => {
+        const first = toggleCase('a', false);
+        const second = toggleCase('a', first.isUppercase);
+        expect(second.isUppercase).toBe(false);
     });
 
-    it('toggle does not change selected index', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        const idx = popup._selectedIndex;
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        expect(popup._selectedIndex).toBe(idx);
+    it('resolveKeyAction returns toggle_case for Shift', () => {
+        const state = {selectedIndex: 2, currentChars: ACCENT_MAP.a, baseVowel: 'a', isUppercase: false};
+        const action = resolveKeyAction(KeySyms.Shift_L, state);
+        expect(action.type).toBe('toggle_case');
     });
 });
 
 describe('Case Toggle — Character Updates', () => {
     for (const vowel of Object.keys(ACCENT_MAP)) {
         it(`characters update to uppercase for vowel "${vowel}"`, () => {
-            const popup = makePopup(vowel);
-            popup.handleKeyPress(CK.KEY_Shift_L);
-            const expected = ACCENT_MAP[vowel].map(c => c.toUpperCase());
-            expect(popup._currentChars).toEqual(expected);
+            const result = toggleCase(vowel, false);
+            const expected = ACCENT_MAP[vowel].map((c) => c.toUpperCase());
+            expect(result.chars).toEqual(expected);
         });
 
         it(`characters revert to lowercase for vowel "${vowel}"`, () => {
-            const popup = makePopup(vowel);
-            popup.handleKeyPress(CK.KEY_Shift_L);
-            popup.handleKeyPress(CK.KEY_Shift_L);
-            expect(popup._currentChars).toEqual(ACCENT_MAP[vowel]);
+            const up = toggleCase(vowel, false);
+            const down = toggleCase(vowel, up.isUppercase);
+            expect(down.chars).toEqual(ACCENT_MAP[vowel]);
         });
     }
 });
 
 describe('Case Toggle — Selection After Toggle', () => {
     it('selecting after toggle yields uppercase character', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_Return);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.a[0].toUpperCase());
+        const toggled = toggleCase('a', false);
+        expect(toggled.chars[0]).toBe(ACCENT_MAP.a[0].toUpperCase());
     });
 
     it('selecting after double toggle yields lowercase character', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_Return);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.a[0]);
+        const first = toggleCase('a', false);
+        const second = toggleCase('a', first.isUppercase);
+        expect(second.chars[0]).toBe(ACCENT_MAP.a[0]);
     });
 
     it('number key selection works after case toggle', () => {
-        const popup = makePopup('e');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_3);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.e[2].toUpperCase());
+        const toggled = toggleCase('e', false);
+        const state = {selectedIndex: 0, currentChars: toggled.chars, baseVowel: 'e', isUppercase: true};
+        const action = resolveKeyAction(KeySyms.KEY_3, state);
+        expect(action.type).toBe('select');
+        expect(toggled.chars[action.charIndex]).toBe(ACCENT_MAP.e[2].toUpperCase());
     });
 });
 
 describe('Case Toggle — Opened Uppercase', () => {
     it('toggle from uppercase to lowercase', () => {
-        const popup = makePopup('A');
-        expect(popup._isUppercase).toBe(true);
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        expect(popup._isUppercase).toBe(false);
-        expect(popup._currentChars).toEqual(ACCENT_MAP.a);
+        const lookup = lookupVowel('A');
+        expect(lookup.isUppercase).toBe(true);
+        const result = toggleCase(lookup.baseVowel, lookup.isUppercase);
+        expect(result.isUppercase).toBe(false);
+        expect(result.chars).toEqual(ACCENT_MAP.a);
     });
 
     it('toggle back to uppercase', () => {
-        const popup = makePopup('A');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        expect(popup._isUppercase).toBe(true);
-        expect(popup._currentChars).toEqual(UPPERCASE_MAP.A);
+        const lookup = lookupVowel('A');
+        const down = toggleCase(lookup.baseVowel, lookup.isUppercase);
+        const up = toggleCase(lookup.baseVowel, down.isUppercase);
+        expect(up.isUppercase).toBe(true);
+        expect(up.chars).toEqual(UPPERCASE_MAP.A);
     });
 });

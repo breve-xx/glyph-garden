@@ -6,19 +6,42 @@ and how to extend it.
 ## Overview
 
 The test suite verifies all core functionality of the Glyph Garden GNOME Shell
-extension:
+extension by importing and exercising the **real production code** in
+`src/core.js`:
 
 | Area | What's Tested |
 |------|---------------|
 | Accent maps | Data integrity, character counts, Unicode validity, no duplicates |
-| Navigation | Arrow keys, vim keys (h/l), Home/End, bounds clamping |
-| Selection | Enter key, number keys 1–9, out-of-range rejection |
-| Case toggling | Shift toggles lower↔upper, character updates, state tracking |
-| Key events | Escape dismiss, return values (EVENT_STOP), combined sequences |
+| Navigation | Arrow keys, vim keys (h/l), Home/End, bounds clamping via `resolveKeyAction()` |
+| Selection | Enter key, number keys 1–9, out-of-range rejection via `resolveKeyAction()` + `isValidSelection()` |
+| Case toggling | `toggleCase()` lower↔upper, character updates, state tracking |
+| Key events | `resolveKeyAction()` dispatch — action types, combined sequences |
 | Extension lifecycle | Enable/disable setup/teardown, keybinding registration, re-enable |
 | Preferences | VOWELS array, MODIFIER_PRESETS, `isModifierKey()` function |
 | Schema validation | Key existence, types, defaults, code–schema alignment |
-| Edge cases | Invalid vowels, double dismiss, re-open, rapid toggling, boundary nav |
+| Edge cases | Invalid vowels via `lookupVowel()`, rapid toggling, boundary nav, `buildActionLabel()` |
+
+### Architecture: Testing Real Code
+
+Tests import the **actual production functions** from `src/core.js` (via
+`tests/fixtures.js`), not mocks. This means:
+
+- Changing a constant or function in `src/core.js` immediately affects tests
+- If you break `resolveKeyAction()`, navigation and selection tests fail
+- If you modify `ACCENT_MAP`, accent-map and navigation tests fail
+- Schema tests validate the real `.gschema.xml` file using GLib
+
+The only mock remaining is `MockExtension` in `tests/mocks.js`, which simulates
+the GNOME Shell enable/disable lifecycle (since that requires `gi://Shell`).
+
+```
+src/core.js ──→ tests/fixtures.js ──→ all test files
+    │                                      │
+    │ (real production code)               │ (import & call directly)
+    │                                      │
+    └──→ src/extension.js                  └──→ runner.js (test framework)
+    └──→ src/prefs.js
+```
 
 ## Testing Framework
 
@@ -143,20 +166,23 @@ Results: 89 passed, 1 failed, 90 total
 ## Project Structure
 
 ```
+src/
+└── core.js                     # Pure business logic (tested directly)
+
 tests/
 ├── runner.js                   # Test framework (describe/it/expect)
-├── mocks.js                    # Mock Clutter/St/GNOME Shell APIs
-├── fixtures.js                 # Replicated data from source (ACCENT_MAP, etc.)
+├── mocks.js                    # MockExtension + GdkKeys (minimal mocks)
+├── fixtures.js                 # Re-exports from src/core.js + test constants
 ├── run-all.js                  # Entry point — imports all tests, calls runAll()
 ├── accent-map.test.js          # ACCENT_MAP / UPPERCASE_MAP / ALL_ACCENTS
-├── navigation.test.js          # Arrow keys, vim keys, Home/End
-├── selection.test.js           # Enter, number keys, _selectChar bounds
-├── case-toggle.test.js         # Shift toggling, character updates
-├── key-events.test.js          # Event dispatch, return values, sequences
+├── navigation.test.js          # resolveKeyAction() — arrows, vim, Home/End
+├── selection.test.js           # resolveKeyAction() — Enter, numbers, isValidSelection
+├── case-toggle.test.js         # toggleCase() — upper/lower, char updates
+├── key-events.test.js          # resolveKeyAction() — action types, sequences
 ├── extension-lifecycle.test.js # Enable/disable, keybinding management
 ├── preferences.test.js         # VOWELS, MODIFIER_PRESETS, isModifierKey
 ├── schema.test.js              # GSettings schema validation
-└── edge-cases.test.js          # Invalid inputs, double dismiss, re-open
+└── edge-cases.test.js          # lookupVowel, boundary nav, buildActionLabel
 ```
 
 ## Writing Tests
@@ -191,27 +217,29 @@ import './my-feature.test.js';   // ← add this line
 
 ### Testing Pure Logic
 
-Extract the logic you want to test and replicate it in `fixtures.js` or
-directly in your test file. Since GNOME Shell APIs (St, Clutter, Meta, Shell)
-aren't available outside the Shell process, we test the behavioral algorithms
-with mock objects from `mocks.js`.
+All testable business logic lives in `src/core.js` and is imported directly:
 
 ```javascript
-// ✅ Test the algorithm, not the UI binding
-import { MockPopup } from './mocks.js';
-import { ACCENT_MAP, UPPERCASE_MAP } from './fixtures.js';
+// ✅ Test the real production code
+import { resolveKeyAction, KeySyms, lookupVowel } from './fixtures.js';
 
-const popup = new MockPopup(ACCENT_MAP, UPPERCASE_MAP);
-popup.showForVowel('a');
-popup.handleKeyPress(CK.KEY_Right);
-expect(popup._selectedIndex).toBe(1);
+const lookup = lookupVowel('a');
+const state = {
+    selectedIndex: 0,
+    currentChars: lookup.chars,
+    baseVowel: lookup.baseVowel,
+    isUppercase: lookup.isUppercase,
+};
+const action = resolveKeyAction(KeySyms.Right, state);
+expect(action.type).toBe('navigate');
+expect(action.index).toBe(1);
 ```
 
-### Adding Mock Objects
+### Adding to `src/core.js`
 
-If you need to test new GNOME Shell interactions, add mock factories to
-`tests/mocks.js`. The mock should replicate the behavioral contract of the
-real API without depending on GI imports that require the Shell process.
+When adding new extension features, extract the pure logic (data, validation,
+computation) into `src/core.js` so it can be tested directly. Keep UI/GI
+interactions in `extension.js` or `prefs.js`.
 
 ### Best Practices
 
@@ -220,8 +248,8 @@ real API without depending on GI imports that require the Shell process.
 - **Use descriptive names** — `it('Left arrow does not go below 0')` not
   `it('test 3')`
 - **Test boundaries** — first, last, zero, negative, out-of-range
-- **Keep fixtures in sync** — when changing data in `extension.js` or
-  `prefs.js`, update `tests/fixtures.js` accordingly. The schema test will
+- **Keep fixtures in sync** — `tests/fixtures.js` re-exports from `src/core.js`
+  automatically. No manual sync needed. The schema test will
   catch schema-code drift automatically.
 
 ## Integration with CI

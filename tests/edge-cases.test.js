@@ -1,170 +1,159 @@
 /**
- * Tests for edge cases and boundary conditions.
+ * Tests for edge cases and boundary conditions — using real core.js functions.
  */
 import {describe, it, expect} from './runner.js';
-import {ClutterKeys, MockPopup} from './mocks.js';
-import {ACCENT_MAP, UPPERCASE_MAP, ALL_ACCENTS} from './fixtures.js';
-
-const CK = ClutterKeys;
-
-function makePopup(vowel) {
-    const popup = new MockPopup(ACCENT_MAP, UPPERCASE_MAP);
-    if (vowel) {
-        popup.showForVowel(vowel);
-    }
-    return popup;
-}
+import {
+    ACCENT_MAP, ALL_ACCENTS, KeySyms, resolveKeyAction,
+    lookupVowel, toggleCase, isValidSelection, buildActionLabel,
+} from './fixtures.js';
 
 describe('Edge Cases — Invalid Vowels', () => {
-    it('showForVowel with non-vowel letter does nothing', () => {
-        const popup = makePopup();
-        popup.showForVowel('b');
-        expect(popup.visible).toBe(false);
-        expect(popup._currentChars).toEqual([]);
+    it('lookupVowel with non-vowel letter returns null', () => {
+        expect(lookupVowel('b')).toBeNull();
     });
 
-    it('showForVowel with number does nothing', () => {
-        const popup = makePopup();
-        popup.showForVowel('1');
-        expect(popup.visible).toBe(false);
+    it('lookupVowel with number returns null', () => {
+        expect(lookupVowel('1')).toBeNull();
     });
 
-    it('showForVowel with empty string does nothing', () => {
-        const popup = makePopup();
-        popup.showForVowel('');
-        expect(popup.visible).toBe(false);
+    it('lookupVowel with empty string returns null', () => {
+        expect(lookupVowel('')).toBeNull();
     });
 
-    it('showForVowel with special character does nothing', () => {
-        const popup = makePopup();
-        popup.showForVowel('@');
-        expect(popup.visible).toBe(false);
+    it('lookupVowel with special character returns null', () => {
+        expect(lookupVowel('@')).toBeNull();
     });
 
-    it('showForVowel with multi-char string does nothing', () => {
-        const popup = makePopup();
-        popup.showForVowel('ae');
-        expect(popup.visible).toBe(false);
+    it('lookupVowel with multi-char string returns null', () => {
+        expect(lookupVowel('ae')).toBeNull();
     });
 });
 
-describe('Edge Cases — Double Dismiss', () => {
-    it('dismissing twice does not throw', () => {
-        const popup = makePopup('a');
-        popup.dismiss();
-        let threw = false;
-        try { popup.dismiss(); } catch (e) { threw = true; }
-        expect(threw).toBe(false);
-    });
-
-    it('state is clean after double dismiss', () => {
-        const popup = makePopup('a');
-        popup.dismiss();
-        popup.dismiss();
-        expect(popup.visible).toBe(false);
-        expect(popup._selectedIndex).toBe(0);
-        expect(popup._currentChars).toEqual([]);
-        expect(popup._baseVowel).toBe('');
-        expect(popup._isUppercase).toBe(false);
-    });
-});
-
-describe('Edge Cases — Re-open After Dismiss', () => {
-    it('can reopen with same vowel after dismiss', () => {
-        const popup = makePopup('a');
-        popup.dismiss();
-        popup.showForVowel('a');
-        expect(popup.visible).toBe(true);
-        expect(popup._currentChars).toEqual(ACCENT_MAP.a);
-    });
-
-    it('can reopen with different vowel after dismiss', () => {
-        const popup = makePopup('a');
-        popup.dismiss();
-        popup.showForVowel('e');
-        expect(popup.visible).toBe(true);
-        expect(popup._currentChars).toEqual(ACCENT_MAP.e);
-    });
-
-    it('reopen resets selected index', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.dismiss();
-        popup.showForVowel('a');
-        expect(popup._selectedIndex).toBe(0);
-    });
-});
-
-describe('Edge Cases — Selection After Dismiss', () => {
-    it('key events on dismissed popup are handled gracefully', () => {
-        const popup = makePopup('a');
-        popup.dismiss();
-        // _currentChars is empty, so navigation should still work (clamped)
+describe('Edge Cases — resolveKeyAction on empty state', () => {
+    it('navigation on empty chars does not throw', () => {
+        const state = {selectedIndex: 0, currentChars: [], baseVowel: '', isUppercase: false};
         let threw = false;
         try {
-            popup.handleKeyPress(CK.KEY_Right);
-            popup.handleKeyPress(CK.KEY_Return);
-        } catch (e) { threw = true; }
+            resolveKeyAction(KeySyms.Right, state);
+            resolveKeyAction(KeySyms.Return, state);
+        } catch (e) {
+            threw = true;
+        }
         expect(threw).toBe(false);
+    });
+
+    it('End on empty chars returns navigate with index -1 (clamped by consumer)', () => {
+        const state = {selectedIndex: 0, currentChars: [], baseVowel: '', isUppercase: false};
+        const action = resolveKeyAction(KeySyms.End, state);
+        expect(action.type).toBe('navigate');
+    });
+});
+
+describe('Edge Cases — Lookup then re-lookup', () => {
+    it('lookupVowel returns fresh state each time', () => {
+        const first = lookupVowel('a');
+        const second = lookupVowel('a');
+        expect(first.chars).toEqual(second.chars);
+        expect(first).not.toBe(second);
+    });
+
+    it('lookupVowel for different vowels returns different chars', () => {
+        const a = lookupVowel('a');
+        const e = lookupVowel('e');
+        expect(a.chars).not.toEqual(e.chars);
     });
 });
 
 describe('Edge Cases — Rapid Toggle', () => {
     it('rapid case toggling maintains consistency', () => {
-        const popup = makePopup('a');
+        let isUppercase = false;
+        let chars = ACCENT_MAP.a;
         for (let i = 0; i < 10; i++) {
-            popup.handleKeyPress(CK.KEY_Shift_L);
+            const result = toggleCase('a', isUppercase);
+            isUppercase = result.isUppercase;
+            chars = result.chars;
         }
         // Even number of toggles = back to original
-        expect(popup._isUppercase).toBe(false);
-        expect(popup._currentChars).toEqual(ACCENT_MAP.a);
+        expect(isUppercase).toBe(false);
+        expect(chars).toEqual(ACCENT_MAP.a);
     });
 
     it('odd number of toggles results in uppercase', () => {
-        const popup = makePopup('a');
+        let isUppercase = false;
         for (let i = 0; i < 7; i++) {
-            popup.handleKeyPress(CK.KEY_Shift_L);
+            isUppercase = toggleCase('a', isUppercase).isUppercase;
         }
-        expect(popup._isUppercase).toBe(true);
+        expect(isUppercase).toBe(true);
     });
 });
 
 describe('Edge Cases — Boundary Navigation', () => {
-    it('End on single-char vowel (hypothetical) goes to 0', () => {
-        // Simulate a vowel with 1 character
-        const popup = new MockPopup({x: ['ẋ']}, {X: ['Ẋ']});
-        popup.showForVowel('x');
-        popup.handleKeyPress(CK.KEY_End);
-        expect(popup._selectedIndex).toBe(0);
+    it('End on single-char list goes to 0', () => {
+        const state = {selectedIndex: 0, currentChars: ['ẋ'], baseVowel: 'x', isUppercase: false};
+        const action = resolveKeyAction(KeySyms.End, state);
+        expect(action.index).toBe(0);
     });
 
     it('repeated Left from start stays at 0', () => {
-        const popup = makePopup('i');
+        const lookup = lookupVowel('i');
+        const state = {selectedIndex: 0, currentChars: lookup.chars, baseVowel: 'i', isUppercase: false};
         for (let i = 0; i < 50; i++) {
-            popup.handleKeyPress(CK.KEY_Left);
+            const action = resolveKeyAction(KeySyms.Left, state);
+            state.selectedIndex = action.index;
         }
-        expect(popup._selectedIndex).toBe(0);
+        expect(state.selectedIndex).toBe(0);
     });
 
     it('repeated Right from end stays at last', () => {
-        const popup = makePopup('i');
+        const lookup = lookupVowel('i');
+        const state = {selectedIndex: 0, currentChars: lookup.chars, baseVowel: 'i', isUppercase: false};
         for (let i = 0; i < 50; i++) {
-            popup.handleKeyPress(CK.KEY_Right);
+            const action = resolveKeyAction(KeySyms.Right, state);
+            state.selectedIndex = action.index;
         }
-        expect(popup._selectedIndex).toBe(ACCENT_MAP.i.length - 1);
+        expect(state.selectedIndex).toBe(ACCENT_MAP.i.length - 1);
     });
 });
 
-describe('Edge Cases — showForVowel Replaces Current', () => {
-    it('calling showForVowel while visible replaces content', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.showForVowel('e');
-        expect(popup._currentChars).toEqual(ACCENT_MAP.e);
-        expect(popup._selectedIndex).toBe(0);
-        expect(popup._baseVowel).toBe('e');
+describe('Edge Cases — isValidSelection Boundaries', () => {
+    it('rejects NaN', () => {
+        expect(isValidSelection(NaN, ACCENT_MAP.a)).toBe(false);
+    });
+
+    it('rejects fractional index', () => {
+        expect(isValidSelection(1.5, ACCENT_MAP.a)).toBe(false);
+    });
+
+    it('accepts 0 for non-empty array', () => {
+        expect(isValidSelection(0, ACCENT_MAP.a)).toBe(true);
+    });
+
+    it('rejects any index for empty array', () => {
+        expect(isValidSelection(0, [])).toBe(false);
+    });
+});
+
+describe('Edge Cases — buildActionLabel', () => {
+    it('both false returns "selected"', () => {
+        expect(buildActionLabel(false, false)).toBe('selected');
+    });
+
+    it('copy only returns "copied"', () => {
+        expect(buildActionLabel(true, false)).toBe('copied');
+    });
+
+    it('type only returns "typed"', () => {
+        expect(buildActionLabel(false, true)).toBe('typed');
+    });
+
+    it('both true returns "copied and typed"', () => {
+        expect(buildActionLabel(true, true)).toBe('copied and typed');
+    });
+});
+
+describe('Edge Cases — toggleCase with invalid vowel', () => {
+    it('toggleCase with unknown vowel returns null', () => {
+        expect(toggleCase('z', false)).toBeNull();
     });
 });
 

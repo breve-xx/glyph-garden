@@ -13,22 +13,7 @@ import Gdk from 'gi://Gdk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const VOWELS = [
-    {key: 'accent-vowel-a', label: 'Accent menu for A', vowel: 'a'},
-    {key: 'accent-vowel-e', label: 'Accent menu for E', vowel: 'e'},
-    {key: 'accent-vowel-i', label: 'Accent menu for I', vowel: 'i'},
-    {key: 'accent-vowel-o', label: 'Accent menu for O', vowel: 'o'},
-    {key: 'accent-vowel-u', label: 'Accent menu for U', vowel: 'u'},
-];
-
-const MODIFIER_PRESETS = [
-    {label: 'Super+Alt (default)', value: '<Super><Alt>'},
-    {label: 'Ctrl+Alt',           value: '<Ctrl><Alt>'},
-    {label: 'Super+Shift',        value: '<Super><Shift>'},
-    {label: 'Ctrl+Shift',         value: '<Ctrl><Shift>'},
-    {label: 'Super+Ctrl+Alt',     value: '<Super><Ctrl><Alt>'},
-    {label: 'Super+Ctrl',         value: '<Super><Ctrl>'},
-];
+import {VOWELS, MODIFIER_PRESETS, isModifierKey} from './core.js';
 
 export default class GlyphGardenPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -259,18 +244,4 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         dialog.add_controller(controller);
         dialog.present();
     }
-}
-
-const MODIFIER_KEYS = new Set([
-    Gdk.KEY_Shift_L, Gdk.KEY_Shift_R,
-    Gdk.KEY_Control_L, Gdk.KEY_Control_R,
-    Gdk.KEY_Alt_L, Gdk.KEY_Alt_R,
-    Gdk.KEY_Super_L, Gdk.KEY_Super_R,
-    Gdk.KEY_Meta_L, Gdk.KEY_Meta_R,
-    Gdk.KEY_Hyper_L, Gdk.KEY_Hyper_R,
-    Gdk.KEY_ISO_Level3_Shift,
-]);
-
-function isModifierKey(keyval) {
-    return MODIFIER_KEYS.has(keyval);
 }

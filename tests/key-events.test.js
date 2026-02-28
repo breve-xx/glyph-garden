@@ -1,120 +1,131 @@
 /**
- * Tests for keyboard event handling dispatch.
+ * Tests for key event dispatch — using real resolveKeyAction from core.js.
  */
 import {describe, it, expect} from './runner.js';
-import {ClutterKeys, MockPopup} from './mocks.js';
-import {ACCENT_MAP, UPPERCASE_MAP} from './fixtures.js';
+import {ACCENT_MAP, KeySyms, resolveKeyAction, lookupVowel, toggleCase} from './fixtures.js';
 
-const CK = ClutterKeys;
-
-function makePopup(vowel) {
-    const popup = new MockPopup(ACCENT_MAP, UPPERCASE_MAP);
-    popup.showForVowel(vowel || 'a');
-    return popup;
+function makeState(vowel) {
+    const lookup = lookupVowel(vowel || 'a');
+    return {
+        selectedIndex: 0,
+        currentChars: lookup.chars,
+        baseVowel: lookup.baseVowel,
+        isUppercase: lookup.isUppercase,
+    };
 }
 
-describe('Key Events — Return Values', () => {
-    it('Escape returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Escape)).toBe(CK.EVENT_STOP);
+function applyAction(state, symbol) {
+    const action = resolveKeyAction(symbol, state);
+    switch (action.type) {
+        case 'navigate': {
+            state.selectedIndex = action.index;
+            break;
+        }
+        case 'toggle_case': {
+            const result = toggleCase(state.baseVowel, state.isUppercase);
+            if (result) {
+                state.isUppercase = result.isUppercase;
+                state.currentChars = result.chars;
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    return action;
+}
+
+describe('Key Events — Action Types', () => {
+    it('Escape returns dismiss action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Escape, state).type).toBe('dismiss');
     });
 
-    it('Left returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Left)).toBe(CK.EVENT_STOP);
+    it('Left returns navigate action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Left, state).type).toBe('navigate');
     });
 
-    it('Right returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Right)).toBe(CK.EVENT_STOP);
+    it('Right returns navigate action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Right, state).type).toBe('navigate');
     });
 
-    it('Return returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Return)).toBe(CK.EVENT_STOP);
+    it('Return returns select action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Return, state).type).toBe('select');
     });
 
-    it('Shift_L returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Shift_L)).toBe(CK.EVENT_STOP);
+    it('Shift_L returns toggle_case action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Shift_L, state).type).toBe('toggle_case');
     });
 
-    it('Home returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_Home)).toBe(CK.EVENT_STOP);
+    it('Home returns navigate action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.Home, state).type).toBe('navigate');
     });
 
-    it('End returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_End)).toBe(CK.EVENT_STOP);
+    it('End returns navigate action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.End, state).type).toBe('navigate');
     });
 
-    it('Number key 1 returns EVENT_STOP', () => {
-        const popup = makePopup('a');
-        expect(popup.handleKeyPress(CK.KEY_1)).toBe(CK.EVENT_STOP);
+    it('Number key 1 returns select action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(KeySyms.KEY_1, state).type).toBe('select');
     });
 
-    it('Unknown key returns EVENT_STOP (keys are consumed)', () => {
-        const popup = makePopup('a');
-        const result = popup.handleKeyPress(0xffff);
-        expect(result).toBe(CK.EVENT_STOP);
+    it('Unknown key returns none action', () => {
+        const state = makeState('a');
+        expect(resolveKeyAction(0xffff, state).type).toBe('none');
     });
 });
 
 describe('Key Events — Escape', () => {
-    it('Escape dismisses the popup', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Escape);
-        expect(popup.visible).toBe(false);
-    });
-
-    it('Escape resets state', () => {
-        const popup = makePopup('a');
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Escape);
-        expect(popup._selectedIndex).toBe(0);
-        expect(popup._currentChars).toEqual([]);
-        expect(popup._baseVowel).toBe('');
+    it('Escape produces dismiss action', () => {
+        const state = makeState('a');
+        const action = resolveKeyAction(KeySyms.Escape, state);
+        expect(action.type).toBe('dismiss');
     });
 });
 
 describe('Key Events — Combined Sequences', () => {
     it('navigate then select', () => {
-        const popup = makePopup('o');
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Right);
-        popup.handleKeyPress(CK.KEY_Return);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.o[3]);
-        expect(popup.visible).toBe(false);
+        const state = makeState('o');
+        applyAction(state, KeySyms.Right);
+        applyAction(state, KeySyms.Right);
+        applyAction(state, KeySyms.Right);
+        const action = resolveKeyAction(KeySyms.Return, state);
+        expect(action.type).toBe('select');
+        expect(state.currentChars[action.charIndex]).toBe(ACCENT_MAP.o[3]);
     });
 
     it('toggle case then navigate then select', () => {
-        const popup = makePopup('u');
-        popup.handleKeyPress(CK.KEY_Shift_L);
-        popup.handleKeyPress(CK.KEY_End);
-        popup.handleKeyPress(CK.KEY_Return);
+        const state = makeState('u');
+        applyAction(state, KeySyms.Shift_L);
+        applyAction(state, KeySyms.End);
+        const action = resolveKeyAction(KeySyms.Return, state);
         const lastIdx = ACCENT_MAP.u.length - 1;
-        expect(popup._copiedChar).toBe(ACCENT_MAP.u[lastIdx].toUpperCase());
+        expect(state.currentChars[action.charIndex]).toBe(ACCENT_MAP.u[lastIdx].toUpperCase());
     });
 
     it('End, Left, Left, Enter selects third-from-last', () => {
-        const popup = makePopup('a');
+        const state = makeState('a');
         const len = ACCENT_MAP.a.length;
-        popup.handleKeyPress(CK.KEY_End);
-        popup.handleKeyPress(CK.KEY_Left);
-        popup.handleKeyPress(CK.KEY_Left);
-        popup.handleKeyPress(CK.KEY_Return);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.a[len - 3]);
+        applyAction(state, KeySyms.End);
+        applyAction(state, KeySyms.Left);
+        applyAction(state, KeySyms.Left);
+        const action = resolveKeyAction(KeySyms.Return, state);
+        expect(state.currentChars[action.charIndex]).toBe(ACCENT_MAP.a[len - 3]);
     });
 
     it('vim navigation then number key', () => {
-        const popup = makePopup('e');
-        popup.handleKeyPress(CK.KEY_l);
-        popup.handleKeyPress(CK.KEY_l);
-        // Number key selection is independent of navigation position
-        popup.handleKeyPress(CK.KEY_1);
-        expect(popup._copiedChar).toBe(ACCENT_MAP.e[0]);
+        const state = makeState('e');
+        applyAction(state, KeySyms.l);
+        applyAction(state, KeySyms.l);
+        const action = resolveKeyAction(KeySyms.KEY_1, state);
+        expect(action.charIndex).toBe(0);
     });
 });
