@@ -3,7 +3,7 @@ EXTENSION_DIR = $(HOME)/.local/share/gnome-shell/extensions/$(UUID)
 SRC_DIR = src
 SCHEMA_DIR = $(SRC_DIR)/schemas
 SCHEMA_FILE = $(SCHEMA_DIR)/org.gnome.shell.extensions.glyph-garden.gschema.xml
-DIST_FILES = $(SRC_DIR)/metadata.json $(SRC_DIR)/extension.js $(SRC_DIR)/prefs.js $(SRC_DIR)/stylesheet.css $(SRC_DIR)/schemas/
+DIST_FILES = metadata.json extension.js core.js prefs.js stylesheet.css schemas/
 
 .PHONY: all build install uninstall package clean lint test
 
@@ -14,8 +14,7 @@ build:
 
 install: build
 	mkdir -p $(EXTENSION_DIR)
-	cp $(SRC_DIR)/metadata.json $(SRC_DIR)/extension.js $(SRC_DIR)/prefs.js $(SRC_DIR)/stylesheet.css $(EXTENSION_DIR)/
-	cp -r $(SRC_DIR)/schemas $(EXTENSION_DIR)/
+	cp -r $(addprefix $(SRC_DIR)/,$(DIST_FILES)) $(EXTENSION_DIR)/
 	@echo "Extension installed to $(EXTENSION_DIR)"
 	@echo "Restart GNOME Shell (log out/in on Wayland) then enable with:"
 	@echo "  gnome-extensions enable $(UUID)"
@@ -26,7 +25,7 @@ uninstall:
 
 package: build
 	@mkdir -p dist
-	cd $(SRC_DIR) && zip -r ../dist/$(UUID).zip metadata.json extension.js prefs.js stylesheet.css schemas/
+	cd $(SRC_DIR) && zip -r ../dist/$(UUID).zip $(DIST_FILES)
 	@echo "Package created: dist/$(UUID).zip"
 	@echo "Install via: gnome-extensions install dist/$(UUID).zip"
 
@@ -36,7 +35,7 @@ clean:
 
 lint:
 	@echo "Checking JavaScript syntax..."
-	@for f in $(SRC_DIR)/extension.js $(SRC_DIR)/prefs.js; do \
+	@for f in $(addprefix $(SRC_DIR)/,$(filter %.js,$(DIST_FILES))); do \
 		node --check $$f 2>/dev/null && echo "  $$f: OK" || echo "  $$f: SYNTAX ERROR"; \
 	done
 	@echo "Validating metadata.json..."

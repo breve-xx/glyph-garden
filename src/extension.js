@@ -111,7 +111,7 @@ class AccentPopup extends St.BoxLayout {
         this._row.destroy_all_children();
         this._buttons = [];
 
-        chars.forEach((char, index) => {
+        this._currentChars.forEach((char, index) => {
             const btn = new St.BoxLayout({
                 style_class: 'accent-button',
                 vertical: true,
