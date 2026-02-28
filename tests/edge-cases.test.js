@@ -9,7 +9,9 @@ const CK = ClutterKeys;
 
 function makePopup(vowel) {
     const popup = new MockPopup(ACCENT_MAP, UPPERCASE_MAP);
-    if (vowel) popup.showForVowel(vowel);
+    if (vowel) {
+        popup.showForVowel(vowel);
+    }
     return popup;
 }
 
@@ -111,8 +113,9 @@ describe('Edge Cases — Selection After Dismiss', () => {
 describe('Edge Cases — Rapid Toggle', () => {
     it('rapid case toggling maintains consistency', () => {
         const popup = makePopup('a');
-        for (let i = 0; i < 10; i++)
+        for (let i = 0; i < 10; i++) {
             popup.handleKeyPress(CK.KEY_Shift_L);
+        }
         // Even number of toggles = back to original
         expect(popup._isUppercase).toBe(false);
         expect(popup._currentChars).toEqual(ACCENT_MAP.a);
@@ -120,8 +123,9 @@ describe('Edge Cases — Rapid Toggle', () => {
 
     it('odd number of toggles results in uppercase', () => {
         const popup = makePopup('a');
-        for (let i = 0; i < 7; i++)
+        for (let i = 0; i < 7; i++) {
             popup.handleKeyPress(CK.KEY_Shift_L);
+        }
         expect(popup._isUppercase).toBe(true);
     });
 });
@@ -137,15 +141,17 @@ describe('Edge Cases — Boundary Navigation', () => {
 
     it('repeated Left from start stays at 0', () => {
         const popup = makePopup('i');
-        for (let i = 0; i < 50; i++)
+        for (let i = 0; i < 50; i++) {
             popup.handleKeyPress(CK.KEY_Left);
+        }
         expect(popup._selectedIndex).toBe(0);
     });
 
     it('repeated Right from end stays at last', () => {
         const popup = makePopup('i');
-        for (let i = 0; i < 50; i++)
+        for (let i = 0; i < 50; i++) {
             popup.handleKeyPress(CK.KEY_Right);
+        }
         expect(popup._selectedIndex).toBe(ACCENT_MAP.i.length - 1);
     });
 });

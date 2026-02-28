@@ -114,7 +114,9 @@ export class MockPopup {
 
     showForVowel(vowel) {
         const chars = this._allAccents[vowel];
-        if (!chars) return;
+        if (!chars) {
+            return;
+        }
 
         this._baseVowel = vowel.toLowerCase();
         this._isUppercase = vowel !== vowel.toLowerCase();
@@ -133,14 +135,18 @@ export class MockPopup {
             ? this._baseVowel
             : this._baseVowel.toUpperCase();
         const newChars = this._allAccents[newVowel];
-        if (!newChars) return;
+        if (!newChars) {
+            return;
+        }
 
         this._isUppercase = !this._isUppercase;
         this._currentChars = [...newChars];
     }
 
     _selectChar(index) {
-        if (index < 0 || index >= this._currentChars.length) return;
+        if (index < 0 || index >= this._currentChars.length) {
+            return;
+        }
         this._copiedChar = this._currentChars[index];
         this.dismiss();
     }

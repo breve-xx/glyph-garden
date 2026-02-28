@@ -10,7 +10,6 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 import Gdk from 'gi://Gdk';
-import GObject from 'gi://GObject';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -91,10 +90,11 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         });
         settings.bind('dialog-opacity', opacityScale.adjustment, 'value',
             Gio.SettingsBindFlags.DEFAULT);
-        opacityScale.adjustment.connect('value-changed', adj => {
+        opacityScale.adjustment.connect('value-changed', (adj) => {
             const snapped = Math.round(adj.value / 10) * 10;
-            if (adj.value !== snapped)
+            if (adj.value !== snapped) {
                 adj.value = snapped;
+            }
         });
         opacityRow.add_suffix(opacityScale);
         behaviourGroup.add(opacityRow);
@@ -112,8 +112,9 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         });
 
         const prefixModel = new Gtk.StringList();
-        for (const preset of MODIFIER_PRESETS)
+        for (const preset of MODIFIER_PRESETS) {
             prefixModel.append(preset.label);
+        }
         prefixRow.model = prefixModel;
 
         // Set active row from current setting
@@ -126,7 +127,9 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
 
         prefixRow.connect('notify::selected', () => {
             const idx = prefixRow.selected;
-            if (idx < 0 || idx >= MODIFIER_PRESETS.length) return;
+            if (idx < 0 || idx >= MODIFIER_PRESETS.length) {
+                return;
+            }
             const prefix = MODIFIER_PRESETS[idx].value;
             settings.set_string('modifier-prefix', prefix);
 
@@ -134,8 +137,9 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
             for (const {key, vowel} of VOWELS) {
                 const accel = `${prefix}${vowel}`;
                 settings.set_strv(key, [accel]);
-                if (shortcutLabels[key])
+                if (shortcutLabels[key]) {
                     shortcutLabels[key].accelerator = accel;
+                }
             }
         });
 
@@ -151,7 +155,7 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         for (const {key, label, vowel} of VOWELS) {
             const row = new Adw.ActionRow({
                 title: _(label),
-                subtitle: _(`Shortcut to open accent menu for ${vowel.toUpperCase()}`),
+                subtitle: _('Shortcut to open accent menu for %s').replace('%s', vowel.toUpperCase()),
             });
 
             const currentBinding = settings.get_strv(key);
@@ -216,7 +220,7 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         contentArea.margin_end = 20;
 
         const infoLabel = new Gtk.Label({
-            label: _(`Press a key combination for:\n<b>${label}</b>\n\nPress Escape to cancel, Backspace to disable.`),
+            label: _('Press a key combination for:\n<b>%s</b>\n\nPress Escape to cancel, Backspace to disable.').replace('%s', label),
             use_markup: true,
             justify: Gtk.Justification.CENTER,
         });
@@ -224,8 +228,9 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
 
         const controller = new Gtk.EventControllerKey();
         controller.connect('key-pressed', (_ctrl, keyval, keycode, state) => {
-            if (isModifierKey(keyval))
+            if (isModifierKey(keyval)) {
                 return Gdk.EVENT_STOP;
+            }
 
             if (keyval === Gdk.KEY_Escape) {
                 dialog.close();
@@ -256,14 +261,16 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
     }
 }
 
+const MODIFIER_KEYS = new Set([
+    Gdk.KEY_Shift_L, Gdk.KEY_Shift_R,
+    Gdk.KEY_Control_L, Gdk.KEY_Control_R,
+    Gdk.KEY_Alt_L, Gdk.KEY_Alt_R,
+    Gdk.KEY_Super_L, Gdk.KEY_Super_R,
+    Gdk.KEY_Meta_L, Gdk.KEY_Meta_R,
+    Gdk.KEY_Hyper_L, Gdk.KEY_Hyper_R,
+    Gdk.KEY_ISO_Level3_Shift,
+]);
+
 function isModifierKey(keyval) {
-    return [
-        Gdk.KEY_Shift_L, Gdk.KEY_Shift_R,
-        Gdk.KEY_Control_L, Gdk.KEY_Control_R,
-        Gdk.KEY_Alt_L, Gdk.KEY_Alt_R,
-        Gdk.KEY_Super_L, Gdk.KEY_Super_R,
-        Gdk.KEY_Meta_L, Gdk.KEY_Meta_R,
-        Gdk.KEY_Hyper_L, Gdk.KEY_Hyper_R,
-        Gdk.KEY_ISO_Level3_Shift,
-    ].includes(keyval);
+    return MODIFIER_KEYS.has(keyval);
 }

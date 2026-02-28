@@ -57,14 +57,16 @@ export const SCHEMA_KEYS = [
 ];
 
 // isModifierKey — replicated from prefs.js
+const MODIFIER_KEYS = new Set([
+    0xffe1, 0xffe2, // Shift_L, Shift_R
+    0xffe3, 0xffe4, // Control_L, Control_R
+    0xffe9, 0xffea, // Alt_L, Alt_R
+    0xffeb, 0xffec, // Super_L, Super_R
+    0xffe7, 0xffe8, // Meta_L, Meta_R
+    0xffed, 0xffee, // Hyper_L, Hyper_R
+    0xfe03,         // ISO_Level3_Shift
+]);
+
 export function isModifierKey(keyval) {
-    return [
-        0xffe1, 0xffe2, // Shift_L, Shift_R
-        0xffe3, 0xffe4, // Control_L, Control_R
-        0xffe9, 0xffea, // Alt_L, Alt_R
-        0xffeb, 0xffec, // Super_L, Super_R
-        0xffe7, 0xffe8, // Meta_L, Meta_R
-        0xffed, 0xffee, // Hyper_L, Hyper_R
-        0xfe03,         // ISO_Level3_Shift
-    ].includes(keyval);
+    return MODIFIER_KEYS.has(keyval);
 }

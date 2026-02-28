@@ -87,7 +87,9 @@ describe('Schema — Key Existence', () => {
 });
 
 describe('Schema — Key Types', () => {
-    if (!schemaKeys) return;
+    if (!schemaKeys) {
+        return;
+    }
 
     for (const key of SCHEMA_KEYS) {
         it(`key "${key.name}" has type "${key.type}"`, () => {
@@ -97,7 +99,9 @@ describe('Schema — Key Types', () => {
 });
 
 describe('Schema — Default Values', () => {
-    if (!schemaKeys) return;
+    if (!schemaKeys) {
+        return;
+    }
 
     it('modifier-prefix defaults to Super+Alt', () => {
         const raw = schemaKeys['modifier-prefix'].defaultRaw;
@@ -130,7 +134,9 @@ describe('Schema — Default Values', () => {
 });
 
 describe('Schema — Code Alignment', () => {
-    if (!schemaKeys) return;
+    if (!schemaKeys) {
+        return;
+    }
 
     it('all VOWELS keys exist in schema', () => {
         for (const {key} of VOWELS) {

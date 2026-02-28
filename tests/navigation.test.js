@@ -42,8 +42,9 @@ describe('Navigation — Arrow Keys', () => {
     it('Right arrow does not exceed last index', () => {
         const popup = makePopup('a');
         const max = ACCENT_MAP.a.length - 1;
-        for (let i = 0; i < 20; i++)
+        for (let i = 0; i < 20; i++) {
             popup.handleKeyPress(CK.KEY_Right);
+        }
         expect(popup._selectedIndex).toBe(max);
     });
 
@@ -80,8 +81,9 @@ describe('Navigation — Vim Keys', () => {
 
     it('"l" does not exceed last index', () => {
         const popup = makePopup('i'); // 7 chars
-        for (let i = 0; i < 20; i++)
+        for (let i = 0; i < 20; i++) {
             popup.handleKeyPress(CK.KEY_l);
+        }
         expect(popup._selectedIndex).toBe(ACCENT_MAP.i.length - 1);
     });
 });

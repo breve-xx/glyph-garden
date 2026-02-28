@@ -50,8 +50,9 @@ export function describe(name, fn) {
  * Define a single test case inside a describe() block.
  */
 export function it(name, fn) {
-    if (!currentSuite)
+    if (!currentSuite) {
         throw new Error('it() must be called inside describe()');
+    }
 
     try {
         fn();
@@ -69,92 +70,109 @@ export function it(name, fn) {
 export function expect(actual) {
     return {
         toBe(expected) {
-            if (actual !== expected)
+            if (actual !== expected) {
                 throw new Error(`Expected ${fmt(expected)}, got ${fmt(actual)}`);
+            }
         },
 
         toEqual(expected) {
             const a = JSON.stringify(actual);
             const b = JSON.stringify(expected);
-            if (a !== b)
+            if (a !== b) {
                 throw new Error(`Expected ${b}, got ${a}`);
+            }
         },
 
         toBeGreaterThan(n) {
-            if (!(actual > n))
+            if (!(actual > n)) {
                 throw new Error(`Expected ${fmt(actual)} > ${fmt(n)}`);
+            }
         },
 
         toBeGreaterThanOrEqual(n) {
-            if (!(actual >= n))
+            if (!(actual >= n)) {
                 throw new Error(`Expected ${fmt(actual)} >= ${fmt(n)}`);
+            }
         },
 
         toBeLessThan(n) {
-            if (!(actual < n))
+            if (!(actual < n)) {
                 throw new Error(`Expected ${fmt(actual)} < ${fmt(n)}`);
+            }
         },
 
         toBeLessThanOrEqual(n) {
-            if (!(actual <= n))
+            if (!(actual <= n)) {
                 throw new Error(`Expected ${fmt(actual)} <= ${fmt(n)}`);
+            }
         },
 
         toBeTruthy() {
-            if (!actual)
+            if (!actual) {
                 throw new Error(`Expected truthy, got ${fmt(actual)}`);
+            }
         },
 
         toBeFalsy() {
-            if (actual)
+            if (actual) {
                 throw new Error(`Expected falsy, got ${fmt(actual)}`);
+            }
         },
 
         toBeNull() {
-            if (actual !== null)
+            if (actual !== null) {
                 throw new Error(`Expected null, got ${fmt(actual)}`);
+            }
         },
 
         toBeUndefined() {
-            if (actual !== undefined)
+            if (actual !== undefined) {
                 throw new Error(`Expected undefined, got ${fmt(actual)}`);
+            }
         },
 
         toBeDefined() {
-            if (actual === undefined)
-                throw new Error(`Expected defined, got undefined`);
+            if (actual === undefined) {
+                throw new Error('Expected defined, got undefined');
+            }
         },
 
         toBeInstanceOf(cls) {
-            if (!(actual instanceof cls))
+            if (!(actual instanceof cls)) {
                 throw new Error(`Expected instance of ${cls.name}`);
+            }
         },
 
         toContain(item) {
             if (Array.isArray(actual)) {
-                if (!actual.includes(item))
+                if (!actual.includes(item)) {
                     throw new Error(`Expected array to contain ${fmt(item)}`);
+                }
             } else if (typeof actual === 'string') {
-                if (!actual.includes(item))
+                if (!actual.includes(item)) {
                     throw new Error(`Expected string to contain ${fmt(item)}`);
+                }
             } else {
                 throw new Error(`toContain requires array or string, got ${typeof actual}`);
             }
         },
 
         toHaveLength(n) {
-            if (actual.length !== n)
+            if (actual.length !== n) {
                 throw new Error(`Expected length ${n}, got ${actual.length}`);
+            }
         },
 
         toMatch(pattern) {
-            if (!pattern.test(actual))
+            if (!pattern.test(actual)) {
                 throw new Error(`Expected ${fmt(actual)} to match ${pattern}`);
+            }
         },
 
         toThrow(expectedMsg) {
-            if (typeof actual !== 'function')
+            if (typeof actual !== 'function') {
                 throw new Error('toThrow requires a function');
+            }
             let threw = false;
             let msg = '';
             try {
@@ -163,34 +181,42 @@ export function expect(actual) {
                 threw = true;
                 msg = e.message;
             }
-            if (!threw)
+            if (!threw) {
                 throw new Error('Expected function to throw');
-            if (expectedMsg !== undefined && !msg.includes(expectedMsg))
+            }
+            if (expectedMsg !== undefined && !msg.includes(expectedMsg)) {
                 throw new Error(`Expected throw message to contain ${fmt(expectedMsg)}, got ${fmt(msg)}`);
+            }
         },
 
         not: {
             toBe(expected) {
-                if (actual === expected)
+                if (actual === expected) {
                     throw new Error(`Expected ${fmt(actual)} not to be ${fmt(expected)}`);
+                }
             },
             toContain(item) {
-                if (Array.isArray(actual) && actual.includes(item))
+                if (Array.isArray(actual) && actual.includes(item)) {
                     throw new Error(`Expected array not to contain ${fmt(item)}`);
-                if (typeof actual === 'string' && actual.includes(item))
+                }
+                if (typeof actual === 'string' && actual.includes(item)) {
                     throw new Error(`Expected string not to contain ${fmt(item)}`);
+                }
             },
             toBeNull() {
-                if (actual === null)
+                if (actual === null) {
                     throw new Error('Expected not null');
+                }
             },
             toBeUndefined() {
-                if (actual === undefined)
+                if (actual === undefined) {
                     throw new Error('Expected not undefined');
+                }
             },
             toBeTruthy() {
-                if (actual)
+                if (actual) {
                     throw new Error(`Expected falsy, got ${fmt(actual)}`);
+                }
             },
         },
     };
@@ -200,8 +226,9 @@ export function expect(actual) {
  * Simple assertion with optional message.
  */
 export function assert(condition, message) {
-    if (!condition)
+    if (!condition) {
         throw new Error(message || 'Assertion failed');
+    }
 }
 
 /**
@@ -246,8 +273,14 @@ export function runAll() {
 
 /** @private */
 function fmt(v) {
-    if (typeof v === 'string') return `"${v}"`;
-    if (v === null) return 'null';
-    if (v === undefined) return 'undefined';
+    if (typeof v === 'string') {
+        return `"${v}"`;
+    }
+    if (v === null) {
+        return 'null';
+    }
+    if (v === undefined) {
+        return 'undefined';
+    }
     return String(v);
 }
