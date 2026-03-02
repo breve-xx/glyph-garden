@@ -99,8 +99,15 @@ describe('My Suite', () => {
 | `toHaveLength(n)` | Length check |
 | `toMatch(regex)` | Regex matching |
 | `toThrow(msg?)` | Exception checking (pass a function) |
+| `toBeGreaterThanOrEqual(n)` | `actual >= n` |
+| `toBeLessThanOrEqual(n)` | `actual <= n` |
+| `toBeInstanceOf(cls)` | `actual instanceof cls` |
 | `not.toBe(value)` | Negated strict equality |
+| `not.toEqual(value)` | Negated deep equality |
 | `not.toContain(item)` | Negated inclusion |
+| `not.toBeNull()` | Not null |
+| `not.toBeUndefined()` | Not undefined |
+| `not.toBeTruthy()` | Negated truthiness |
 
 ## Prerequisites
 

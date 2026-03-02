@@ -17,11 +17,9 @@ RUN dnf install -y \
     gnome-shell \
     glib2-devel \
     gjs \
-    gjs-devel \
     libxml2 \
     make \
     zip \
-    unzip \
     dbus-daemon \
     xorg-x11-server-Xvfb \
     && dnf clean all

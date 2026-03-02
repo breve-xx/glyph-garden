@@ -183,7 +183,7 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         // Info group
         const infoGroup = new Adw.PreferencesGroup({
             title: _('Usage'),
-            description: _('Press a shortcut to open the accent popup. Use arrow keys or number keys to select a character. The selected character is copied to your clipboard.'),
+            description: _('Press a shortcut to open the accent popup. Use arrow keys or number keys to select a character. The selected character is typed at the caret, copied to the clipboard, or both — depending on your settings above.'),
         });
         page.add(infoGroup);
     }

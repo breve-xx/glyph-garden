@@ -19,7 +19,6 @@ import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import {
     ACCENT_MAP,
-    ALL_ACCENTS,
     resolveKeyAction,
     toggleCase,
     lookupVowel,
@@ -71,7 +70,7 @@ class AccentPopup extends St.BoxLayout {
 
         this._hintBar = new St.Label({
             style_class: 'accent-hint-bar',
-            text: '← → to navigate · Enter to copy & type · Shift to toggle case · Esc to close',
+            text: '← → to navigate · Enter to select · Shift to toggle case · Esc to close',
             x_align: Clutter.ActorAlign.CENTER,
         });
         this.add_child(this._hintBar);

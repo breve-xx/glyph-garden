@@ -1,6 +1,6 @@
 {
   "name": "Glyph Garden",
-  "description": "macOS-style accented vowel input via keyboard shortcuts. Press Alt+Vowel to see a popup of diacritical variants, then select one to copy it to your clipboard.",
+  "description": "macOS-style accented vowel input via keyboard shortcuts. Press Super+Alt+Vowel to see a popup of diacritical variants, then select one to type it at the caret or copy it to your clipboard.",
   "uuid": "glyph-garden@breve-xx.github.io",
   "shell-version": ["49"],
   "settings-schema": "org.gnome.shell.extensions.glyph-garden",
