@@ -1,7 +1,7 @@
 /**
- * Glyph Garden — GNOME 49 Shell Extension
+ * Glyph Garden — GNOME Shell Extension
  *
- * Replicates macOS-style accented vowel input.
+ * Accented vowel input via keyboard shortcuts.
  * Alt+Vowel opens a centered popup of diacritical variants.
  * Select a character (click, number key, or arrow+Enter) to copy it to clipboard
  * and type it at the current caret position.

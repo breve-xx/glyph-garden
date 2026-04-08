@@ -1,11 +1,10 @@
 # Glyph Garden
 
-A GNOME 49 Shell extension that replicates macOS-style accented vowel input.
+A GNOME Shell extension for accented vowel input.
 Press **Super+Alt+Vowel** to open a centered popup of diacritical variants, then
 select one to copy it to your clipboard. The modifier prefix is fully
 configurable.
 
-![GNOME 49](https://img.shields.io/badge/GNOME-49-blue)
 ![Wayland](https://img.shields.io/badge/Wayland-compatible-green)
 ![License](https://img.shields.io/badge/License-GPL--3.0-orange)
 
@@ -40,7 +39,7 @@ changed to any modifier combination in the preferences.
 ```
 glyph-garden/
 ├── src/
-│   ├── metadata.json      # Extension manifest (UUID, GNOME version)
+│   ├── metadata.json      # Extension manifest (UUID, shell compatibility)
 │   ├── core.js            # Pure business logic (accent data, key dispatch)
 │   ├── extension.js       # Main UI: popup, keybindings, clipboard
 │   ├── prefs.js           # Preferences UI for shortcut configuration
@@ -54,7 +53,7 @@ glyph-garden/
 │   ├── fixtures.js        # Re-exports from src/core.js + test constants
 │   └── *.test.js          # Test files (import real core.js code)
 ├── Makefile               # Build, install, package, test targets
-├── Containerfile          # Docker/Podman container for testing from macOS
+├── Containerfile          # Docker/Podman container for building & testing
 ├── TESTING.md             # Test suite documentation
 └── README.md
 ```
@@ -77,14 +76,14 @@ gnome-extensions enable glyph-garden@breve-xx.github.io
 make package
 # Creates dist/glyph-garden@breve-xx.github.io.zip
 
-# Install the package on any GNOME 49 machine:
+# Install the package on any compatible GNOME machine:
 gnome-extensions install glyph-garden@breve-xx.github.io.zip
 ```
 
-## macOS → Linux Development Workflow
+## Development Without a GNOME Desktop
 
 Since this extension requires GNOME Shell (Linux), here are three approaches
-for developing on macOS:
+for developing on a machine without a GNOME desktop:
 
 ### Option 1: Docker/Podman Container (Build & Validate)
 
@@ -125,20 +124,20 @@ make install
 # 4. For GUI access, use VNC or remote desktop:
 #    sudo dnf install tigervnc-server  # Fedora
 #    vncserver :1 -geometry 1920x1080
-#    Then connect from macOS with any VNC client
+#    Then connect with any VNC client
 
 # 5. Enable the extension
 gnome-extensions enable glyph-garden@breve-xx.github.io
 ```
 
-### Option 3: GNOME OS / Fedora in a VM (Local)
+### Option 3: Fedora / GNOME OS in a Local VM
 
 Best for: Fully local testing with GUI support.
 
 ```bash
-# Use UTM (macOS virtualization app) or QEMU:
+# Use QEMU, virt-manager, or any virtualization tool:
 # 1. Download Fedora 42 Workstation ISO
-# 2. Create a VM with UTM (https://mac.getutm.app)
+# 2. Create a VM with your preferred hypervisor
 # 3. Install Fedora with GNOME desktop
 # 4. Share a folder or use SSH to sync files
 # 5. Install and test as above
@@ -207,7 +206,7 @@ navigation, selection, case toggling, key events, extension lifecycle,
 preferences, schema validation, and edge cases.
 
 ```bash
-# Run tests (requires GJS — use the container on macOS)
+# Run tests (requires GJS — use the container if unavailable)
 make test
 
 # Via Docker/Podman

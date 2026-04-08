@@ -63,8 +63,8 @@ runner rather than Node.js/Jest/Jasmine because:
 
 | Approach | Pros | Cons |
 |----------|------|------|
-| **GJS (chosen)** | Same runtime as extension, GI access, zero deps | Requires Linux/container for macOS devs |
-| Node.js + Jest | Runs on macOS, rich ecosystem | Can't import GI modules, needs mocking layer, adds npm deps |
+| **GJS (chosen)** | Same runtime as extension, GI access, zero deps | Requires Linux or container |
+| Node.js + Jest | Runs anywhere, rich ecosystem | Can't import GI modules, needs mocking layer, adds npm deps |
 | GLib.Test | Native C testing, integrates with GNOME CI | C-oriented API, awkward from JavaScript |
 | Jasmine for GJS | Familiar API | Requires additional setup, less maintained for GJS |
 
@@ -115,7 +115,7 @@ describe('My Suite', () => {
 - **glib-compile-schemas** (for schema compilation; also in the container)
 - No additional packages to install
 
-If you're on macOS, use the Docker/Podman container (see below).
+If GJS is not available locally, use the Docker/Podman container (see below).
 
 ## Running Tests
 
@@ -129,7 +129,7 @@ make test
 gjs -m tests/run-all.js
 ```
 
-### Via Docker/Podman (macOS or CI)
+### Via Docker/Podman (Container or CI)
 
 ```bash
 # Build the dev container (includes tests)

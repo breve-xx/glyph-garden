@@ -1,9 +1,9 @@
 # Containerfile for testing Glyph Garden GNOME extension
 #
-# This sets up a Fedora 42 environment with GNOME 49 libraries
+# This sets up a Fedora 42 environment with GNOME Shell libraries
 # for building, validating, and testing the extension.
 #
-# Usage from macOS:
+# Usage:
 #   docker build -t glyph-garden-dev -f Containerfile .
 #   docker run -it glyph-garden-dev
 #
