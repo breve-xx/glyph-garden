@@ -41,7 +41,7 @@ class AccentPopup extends St.BoxLayout {
     _init(settings) {
         super._init({
             style_class: 'accent-popup',
-            vertical: true,
+            orientation: Clutter.Orientation.VERTICAL,
             reactive: true,
             can_focus: true,
             track_hover: true,
@@ -113,7 +113,7 @@ class AccentPopup extends St.BoxLayout {
         this._currentChars.forEach((char, index) => {
             const btn = new St.BoxLayout({
                 style_class: 'accent-button',
-                vertical: true,
+                orientation: Clutter.Orientation.VERTICAL,
                 reactive: true,
                 can_focus: true,
                 track_hover: true,

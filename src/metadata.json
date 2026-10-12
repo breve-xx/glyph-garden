@@ -2,7 +2,7 @@
   "name": "Glyph Garden",
   "description": "Accented vowel input via keyboard shortcuts. Press Super+Alt+Vowel to see a popup of diacritical variants, then select one to type it at the caret or copy it to your clipboard.",
   "uuid": "glyph-garden@breve-xx.github.io",
-  "shell-version": ["49", "50"],
+  "shell-version": ["49", "50", "51"],
   "settings-schema": "org.gnome.shell.extensions.glyph-garden",
   "url": "https://github.com/breve-xx/glyph-garden",
   "version": 1,
