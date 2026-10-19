@@ -26,14 +26,20 @@ import {
     buildActionLabel,
 } from './core.js';
 
+let virtualKeyboard = null;
+
 function simulatePaste() {
-    const seat = Clutter.get_default_backend().get_default_seat();
-    const vk = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
-    const now = Clutter.get_current_event_time();
-    vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
-    vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.PRESSED);
-    vk.notify_keyval(now, Clutter.KEY_v, Clutter.KeyState.RELEASED);
-    vk.notify_keyval(now, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+    if (!virtualKeyboard) {
+        const seat = global.stage.context.get_backend().get_default_seat();
+        virtualKeyboard = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
+    }
+
+    const send = (keyval, state) =>
+        virtualKeyboard.notify_keyval(GLib.get_monotonic_time(), keyval, state);
+    send(Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+    send(Clutter.KEY_v, Clutter.KeyState.PRESSED);
+    send(Clutter.KEY_v, Clutter.KeyState.RELEASED);
+    send(Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
 }
 
 const AccentPopup = GObject.registerClass(
@@ -150,7 +156,8 @@ class AccentPopup extends St.BoxLayout {
         });
 
         const opacityPct = this._settings.get_int('dialog-opacity');
-        this.opacity = Math.round(opacityPct * 255 / 100);
+        const backgroundAlpha = 0.95 * opacityPct / 100;
+        this.set_style(`background-color: rgba(30, 30, 30, ${backgroundAlpha});`);
 
         this._updateSelection();
         this._positionCenter();
@@ -339,6 +346,7 @@ export default class GlyphGarden extends Extension {
         }
 
         this._settings = null;
+        virtualKeyboard = null;
     }
 
     _onAccentKey(vowel) {

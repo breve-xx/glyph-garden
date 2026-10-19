@@ -56,8 +56,8 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
         behaviourGroup.add(typeRow);
 
         const opacityRow = new Adw.ActionRow({
-            title: _('Dialog opacity'),
-            subtitle: _('Adjust the opacity of the accent popup (0–100%)'),
+            title: _('Popup background opacity'),
+            subtitle: _('Adjust the accent popup background opacity; text and controls remain fully visible (0–100%)'),
         });
         const opacityScale = new Gtk.Scale({
             orientation: Gtk.Orientation.HORIZONTAL,
@@ -70,6 +70,7 @@ export default class GlyphGardenPreferences extends ExtensionPreferences {
             digits: 0,
             draw_value: true,
             value_pos: Gtk.PositionType.RIGHT,
+            width_request: 220,
             hexpand: true,
             valign: Gtk.Align.CENTER,
         });

@@ -29,8 +29,8 @@
 
     <key name="dialog-opacity" type="i">
       <default>100</default>
-      <summary>Dialog opacity</summary>
-      <description>Opacity of the accent popup dialog (0–100%)</description>
+      <summary>Popup background opacity</summary>
+      <description>Opacity of the accent popup background (0–100%); text and controls remain fully visible</description>
       <range min="0" max="100"/>
     </key>
 
